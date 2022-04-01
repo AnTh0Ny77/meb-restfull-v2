@@ -52,7 +52,11 @@ class PostGuestController extends AbstractController
                 }
               
             }else{
-
+                $response = [
+                    "message" => 'unabeld to generate name guest name'
+                ];
+                $data = new JsonResponse($response, '401');
+                return  $data;
             }  
         } else{
             $response = [

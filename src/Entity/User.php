@@ -3,15 +3,69 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use App\Controller\PostGuestController;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ApiResource(
-        collectionOperations: [],
+        collectionOperations: [
+            'postGuest' => [
+                'pagination_enabeld' => false,
+                'path' => 'user/guest',
+                'method' => 'post',
+                'controller' => PostGuestController::class,
+                'read' => true,
+                'openapi_context' => [
+                    'summary' => 'create a guest user',
+                    'requestBody' => [
+                        'content' => [
+                            'application/json' => [
+                                'schema'  => [
+                                    'type'       => 'object',
+                                    'properties' =>[
+                                        'key'  => ['type' => 'integer']  
+                                    ],
+                                ],
+                                'example' =>[
+                                    'key'  => '12456456',
+                                ],
+                            ]
+                        ]
+                    ],
+                    "responses" => [
+                        "201" => [
+                            "description" => "The guest has been created",
+                            "content" => [
+                                "application/json" => [
+                                    "schema" =>  [
+                                        "properties" => [
+                                            "message" => [
+                                                "type" => "string"
+                                            ],
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ],
+                        "401" => [
+                            "description" => "invalid request"
+                        ]
+                    ]
+                
+                ]
+               
+            ]
+        ],
         itemOperations: []
 )]
+/**
+* @UniqueEntity( "email" )
+* @UniqueEntity( "username" )
+*/
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -20,15 +74,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'integer')]
     private $id;
 
+    /**
+    * @Assert\Email(
+    *     message = "The email '{{ value }}' is not a valid email."
+    * )
+    */
     #[ORM\Column(type: 'string', length: 180, unique: true , nullable: true)]
     private $email;
 
     #[ORM\Column(type: 'json')]
     private $roles = [];
 
-    #[ORM\Column(type: 'string')]
+    #[ORM\Column(type: 'string' , nullable: true)]
     private $password;
 
+    /**
+    * @Assert\Length(
+    *      min = 3,
+    *      max = 70,
+    *      minMessage = "Your pseudo must be at least {{ limit }} characters long",
+    *      maxMessage = "Your pseudo cannot be longer than {{ limit }} characters"
+    * )
+    * @Assert\NotBlank
+    */
     #[ORM\Column(type: 'string', length: 255 , unique: true)]
     private $username;
 

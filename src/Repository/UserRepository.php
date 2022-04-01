@@ -79,15 +79,16 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     }
     */
 
-    /*
-    public function findOneBySomeField($value): ?User
+    
+    public function returnMaxGuest()
     {
         return $this->createQueryBuilder('u')
-            ->andWhere('u.exampleField = :val')
-            ->setParameter('val', $value)
+            ->select('MAX(u.username) AS  max')
+            ->where('u.confirmed = :confirm')
+            ->setParameter('confirm', 0)
             ->getQuery()
             ->getOneOrNullResult()
         ;
     }
-    */
+    
 }

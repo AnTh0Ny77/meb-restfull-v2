@@ -21,6 +21,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
                 'read' => true,
                 'openapi_context' => [
                     'summary' => 'create a guest user',
+                    'description' => 'The response contains the username and a connection link for the guest it can only be used once and its lifespan is 300 seconds, be careful to keep the refresh token. ',
                     'requestBody' => [
                         'content' => [
                             'application/json' => [
@@ -46,6 +47,12 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
                                             "message" => [
                                                 "type" => "string"
                                             ],
+                                            "username" => [
+                                                "type" => "string"
+                                            ],
+                                            "link" => [
+                                                "type" => "string"
+                                            ],
                                         ]
                                     ]
                                 ]
@@ -60,7 +67,19 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
                
             ]
         ],
-        itemOperations: []
+        itemOperations: [ 
+            "confirm" => [
+                'method' => 'put',
+                'path' => 'user/guest/confirm',
+                'controller' => PostGuestController::class,
+                'openapi_context' => [
+                    'security' =>
+                    [['bearerAuth' => []]],
+                    'summary'     => 'Update de guest account to classic user account'
+                ],
+                'denormalization_context' => ['groups' => ['put:User']]
+            ]
+        ]
 )]
 /**
 * @UniqueEntity( "email" )
@@ -109,6 +128,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'boolean' )]
     private $confirmed;
 
+
     public function getId(): ?int
     {
         return $this->id;
@@ -133,7 +153,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getUserIdentifier(): string
     {
-        return (string) $this->email;
+        return (string) $this->username;
     }
 
     /**
@@ -175,8 +195,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function eraseCredentials()
     {
-        // If you store any temporary, sensitive data on the user, clear it here
-        // $this->plainPassword = null;
+        $this->plainPassword = null;
     }
 
     public function getUsername(): ?string

@@ -94,6 +94,9 @@
     "friendsofphp/proxy-manager-lts": {
         "version": "v1.0.7"
     },
+    "gesdinet/jwt-refresh-token-bundle": {
+        "version": "v1.0.1"
+    },
     "laminas/laminas-code": {
         "version": "4.5.1"
     },
@@ -247,6 +250,12 @@
             "./src/Controller/.gitignore",
             "./src/Kernel.php"
         ]
+    },
+    "symfony/http-client": {
+        "version": "v6.0.7"
+    },
+    "symfony/http-client-contracts": {
+        "version": "v3.0.0"
     },
     "symfony/http-foundation": {
         "version": "v6.0.6"

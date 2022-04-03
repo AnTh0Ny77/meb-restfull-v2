@@ -12,23 +12,21 @@ use Doctrine\Common\Collections\ArrayCollection;
 #[ORM\Entity(repositoryClass: UnlockGamesRepository::class)]
 #[ApiResource(
         collectionOperations: [
-            'me' => [
-                'pagination_enabeld' => false,
-                'path' => 'UnlockGames/me',
-                'method' => 'get',
-                'controller' => UnlockGamesController::class,
-                'read' => false,
-                'openapi_context' => [
-                    'summary' => 'retrive all the unlock games for the current user',
-                    'security' => [['bearerAuth' => []]]
-                ]
-            ],
-            'unlock' => [     
+            'unlock' => [
+                'pagination_enabeld' => false,  
                 'method' => 'get',
                 'path' => 'UnlockGame/unlock',
                 'controller' => UnlockGamesController::class,
                 'read' => true,
                 'openapi_context' => [
+                    "parameters" =>[
+                        [
+                            "name" => "secret",
+                            "in" => "query",
+                            "required" => true,
+                            "type" => "string"
+                        ]
+                        ],
                     'security' => [['bearerAuth' => []]],
                     'summary' => 'Unlock a game for the current user',
                     'description' => '',
@@ -40,12 +38,6 @@ use Doctrine\Common\Collections\ArrayCollection;
                                     "schema" =>  [
                                         "properties" => [
                                             "message" => [
-                                                "type" => "string"
-                                            ],
-                                            "username" => [
-                                                "type" => "string"
-                                            ],
-                                            "link" => [
                                                 "type" => "string"
                                             ],
                                         ]

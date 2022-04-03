@@ -13,7 +13,7 @@ class QrCode
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[ORM\ManyToOne(targetEntity: user::class)]
+    #[ORM\ManyToOne(targetEntity: User::class)]
     private $idClient;
 
     #[ORM\Column(type: 'string', length: 255 , unique: true)]

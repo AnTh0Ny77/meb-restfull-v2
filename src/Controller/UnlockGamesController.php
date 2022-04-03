@@ -9,7 +9,6 @@ use App\Entity\UnlockGames;
 use App\Repository\GamesRepository;
 use App\Repository\UserRepository;
 use App\Repository\QrCodeRepository;
-use PhpParser\Node\Expr\Instanceof_;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\UnlockGamesRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -39,6 +38,9 @@ class UnlockGamesController extends AbstractController
     public function __invoke(Request $request, GamesRepository $gr , QrCodeRepository $qrRep  , UserRepository $ur , UnlockGamesRepository $urRep)
     {
         $user = $this->security->getUser();
+        if (empty($user)){
+            return $this->json_response('401', 'JWT Token  not found');
+        }
         $user = $ur->findOneBy(array('username' => $user->username));
        
         if(!$user instanceof User){

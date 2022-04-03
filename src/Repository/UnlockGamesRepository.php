@@ -45,22 +45,25 @@ class UnlockGamesRepository extends ServiceEntityRepository
         }
     }
 
-    // /**
-    //  * @return UnlockGames[] Returns an array of UnlockGames objects
-    //  */
-    /*
-    public function findByExampleField($value)
+   
+    public function findByUserQr($value)
     {
-        return $this->createQueryBuilder('u')
-            ->andWhere('u.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('u.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = '
+            SELECT * , q.id_game_id , q.time , g.name  FROM unlock_games u
+            LEFT JOIN qr_code AS q ON ( q.id = u.qr_code_id )
+            LEFT JOIN games AS g ON ( g.id = q.id_game_id )  
+            WHERE u.id_user_id = :val
+            ORDER BY u.id ASC
+            ';
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery(['val' => $value]);
+
+        // returns an array of arrays (i.e. a raw data set)
+        return $resultSet->fetchAllAssociative();
     }
-    */
+    
 
     /*
     public function findOneBySomeField($value): ?UnlockGames

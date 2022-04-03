@@ -2,30 +2,30 @@
 
 namespace App\Repository;
 
-use App\Entity\QrCode;
+use App\Entity\Quest;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method QrCode|null find($id, $lockMode = null, $lockVersion = null)
- * @method QrCode|null findOneBy(array $criteria, array $orderBy = null)
- * @method QrCode[]    findAll()
- * @method QrCode[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Quest|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Quest|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Quest[]    findAll()
+ * @method Quest[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class QrCodeRepository extends ServiceEntityRepository
+class QuestRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, QrCode::class);
+        parent::__construct($registry, Quest::class);
     }
 
     /**
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function add(QrCode $entity, bool $flush = true): void
+    public function add(Quest $entity, bool $flush = true): void
     {
         $this->_em->persist($entity);
         if ($flush) {
@@ -37,7 +37,7 @@ class QrCodeRepository extends ServiceEntityRepository
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function remove(QrCode $entity, bool $flush = true): void
+    public function remove(Quest $entity, bool $flush = true): void
     {
         $this->_em->remove($entity);
         if ($flush) {
@@ -46,7 +46,7 @@ class QrCodeRepository extends ServiceEntityRepository
     }
 
     // /**
-    //  * @return QrCode[] Returns an array of QrCode objects
+    //  * @return Quest[] Returns an array of Quest objects
     //  */
     /*
     public function findByExampleField($value)
@@ -62,15 +62,15 @@ class QrCodeRepository extends ServiceEntityRepository
     }
     */
 
-    
-    // public function findUnlockedGames($value)
-    // {
-    //     return $this->createQueryBuilder('q')
-    //         ->andWhere('q.id = :val')
-    //         ->setParameter('val', $value)
-    //         ->getQuery()
-    //         ->getOneOrNullResult()
-    //     ;
-    // }
-    
+    /*
+    public function findOneBySomeField($value): ?Quest
+    {
+        return $this->createQueryBuilder('q')
+            ->andWhere('q.exampleField = :val')
+            ->setParameter('val', $value)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+    */
 }

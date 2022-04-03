@@ -24,12 +24,34 @@ use Doctrine\ORM\Mapping as ORM;
                     ]
                 ],
                 'security' => [['bearerAuth' => []]],
-                'summary' => 'retrieves a Quest collection with the game id ( the game must have been unlocked )   ',
+                'summary' => 'retrieves a Quest collection with the game id ( the game must have been unlocked )',
+                "responses" => [
+                    "200" => [
+                        "content" => [
+                            "application/json" => [
+                                "schema" =>  [
+                                    "properties" => [
+                                        "quest" => [
+                                            "type" => "string"
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    "401" => [
+                        "description" => "invalid request"
+                    ]
+                ]
             ]
         ],
     ],
     itemOperations: [
-       
+        'get' => [
+            'controller' => NotFoundAction::class,
+            'read' => false,
+            'output' => false
+        ]
     ],
     normalizationContext: ['groups' => ['read:Quest'], "enable_max_depth" => true]
 )]

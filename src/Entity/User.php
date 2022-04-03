@@ -21,7 +21,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
         collectionOperations: [
             'me' => [
                 'pagination_enabeld' => false,
-                'path' => '/me',
+                'path' => 'user/me',
                 'method' => 'get',
                 'controller' => MeController::class,
                 'read' => false,
@@ -101,6 +101,25 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
                                     'firstname' => 'john'
                                 ],
                             ],
+                        ], 
+                        "responses" => [
+                            "201" => [
+                                "description" => "user has been updated",
+                                "content" => [
+                                    "application/json" => [
+                                        "schema" =>  [
+                                            "properties" => [
+                                                "message" => [
+                                                    "type" => "string"
+                                                ] 
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ],
+                            "401" => [
+                                "description" => "invalid request"
+                            ]
                         ]
                     ]
                 ]

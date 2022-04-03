@@ -9,6 +9,7 @@ use App\Entity\UnlockGames;
 use App\Repository\GamesRepository;
 use App\Repository\UserRepository;
 use App\Repository\QrCodeRepository;
+use App\Repository\QuestRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\UnlockGamesRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,17 +36,9 @@ class GetQuestController extends AbstractController
         return $data;
     }
 
-    public function verify_if_unlock($user, $game_id , $qrRep){
-        
-            $unlock =  $qrRep->findOneBy(array('idGame' => intval($game_id)));
-            if(!$unlock instanceof QrCode){
-                return $this->json_response('404', 'invalid game id');
-            }else{
-                dd($unlock);
-            }
-    }
+   
 
-    public function __invoke(Request $request, GamesRepository $gr, QrCodeRepository $qrRep, UserRepository $ur, UnlockGamesRepository $urRep)
+    public function __invoke(Request $request, GamesRepository $gr, QuestRepository $questRep, UserRepository $ur, UnlockGamesRepository $urRep)
     {
         $user = $this->security->getUser();
         if (empty($user)) {
@@ -57,8 +50,30 @@ class GetQuestController extends AbstractController
             return $this->json_response('401', 'user not found');
         } else {
             $game_id =  $request->query->get('game_id');
-            $verify = $this->verify_if_unlock($user , $game_id , $qrRep );
-            dd($verify);
+            $verify = $urRep->findUnlockedr($user->getId(), intval($game_id));
+            if (empty($verify)) {
+                return $this->json_response('401', 'this game is not unlocked for user: '.$user->getUsername().'');
+            }else{
+                $quest = $questRep->findBy(array('game' => intval($game_id)));
+                if (empty($quest)) {
+                    return $this->json_response('401', 'No quest for the game '. $game_id.'');
+                }else{
+                    $response = [];
+                    foreach ($quest as $key => $value) {
+                        $temp = [
+                           'name' => $value->getName(),
+                           'color' => $value->getColor()
+                        ];
+                       array_push($response, $temp);
+                    }
+                    $data = [
+                        "quest" => $response,
+                    ];
+                    $data = new JsonResponse($data, '200');
+                    return  $data;
+                }
+            }
+           
         }
       
     }

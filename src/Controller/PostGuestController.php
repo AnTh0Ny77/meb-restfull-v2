@@ -34,10 +34,11 @@ class PostGuestController extends AbstractController
     }
 
     public function __invoke(Request $request , ValidatorInterface $validator ,UserPasswordHasherInterface $hasher , LoginLinkHandlerInterface $loginLinkHandler){
-        $content = json_decode($request->getContent(), true);
-        if (!empty($content['key'])){
+      
+        
             $user = new User;
             $max = $this->ur->returnMaxGuest();
+        
             if (!empty($max)) {
                 $max = explode('_', $max["max"]);
                 $max = intval($max[1] +1 );
@@ -61,14 +62,15 @@ class PostGuestController extends AbstractController
                     $user->setPassword($pass);
                     $this->em->persist($user);
                     $this->em->flush();
-                    
+                
                     $request_link = $this->forward('App\Controller\SecurityController::loginLink', [
                         'userRepository'  => $this->ur,
                         'username' => $guest_name,
                         'loginLinkHandler' => $loginLinkHandler
                     ]);
-                    dd($request_link);
+                dd($request_link);
                     $link = json_decode($request_link->getContent());
+                
                     $link = $link->link;
                     $response = [
                         "message" => 'The guest has been created',
@@ -86,13 +88,6 @@ class PostGuestController extends AbstractController
                 $data = new JsonResponse($response, '401');
                 return  $data;
             }  
-        } else{
-            $response = [
-                "message" => 'wrong key'
-            ];
-            $data = new JsonResponse($response, '401');
-            return  $data;
-        }
     }
 
 }

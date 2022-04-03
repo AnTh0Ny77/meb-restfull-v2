@@ -38,19 +38,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
                     'summary' => 'create a guest user',
                     'description' => 'The response contains the username and a connection link for the guest it can only be used once and its lifespan is 300 seconds, be careful to keep the refresh token. ',
                     'requestBody' => [
-                        'content' => [
-                            'application/json' => [
-                                'schema'  => [
-                                    'type'       => 'object',
-                                    'properties' =>[
-                                        'key'  => ['type' => 'integer']  
-                                    ],
-                                ],
-                                'example' =>[
-                                    'key'  => '12456456',
-                                ],
-                            ]
-                        ]
+                       
                     ],
                     "responses" => [
                         "201" => [

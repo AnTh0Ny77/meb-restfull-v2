@@ -2,17 +2,30 @@
 
 namespace App\Entity;
 
+use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
 use App\Controller\PostGuestController;
-use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
+use App\Controller\ConfirmGuestController;
 use ApiPlatform\Core\Annotation\ApiResource;
+use App\Controller\MeController;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Lexik\Bundle\JWTAuthenticationBundle\Security\User\JWTUserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 #[ApiResource(
         collectionOperations: [
+            'me' => [
+                'pagination_enabeld' => false,
+                'path' => '/me',
+                'method' => 'get',
+                'controller' => MeController::class,
+                'read' => false,
+                'openapi_context' => [
+                    'security' => [['bearerAuth' => []]]
+                ]
+            ], 
             'postGuest' => [
                 'pagination_enabeld' => false,
                 'path' => 'user/guest',
@@ -68,10 +81,15 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
             ]
         ],
         itemOperations: [ 
+            'get' => [
+                'controller' => NotFoundAction::class ,
+                'read' => false ,
+                'output' => false
+            ],
             "confirm" => [
                 'method' => 'put',
-                'path' => 'user/guest/confirm',
-                'controller' => PostGuestController::class,
+                'path' => 'user/guest/confirm/{id}',
+                'controller' => ConfirmGuestController::class,
                 'openapi_context' => [
                     'security' =>
                     [['bearerAuth' => []]],
@@ -86,7 +104,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 * @UniqueEntity( "username" )
 */
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -117,7 +135,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     * @Assert\NotBlank
     */
     #[ORM\Column(type: 'string', length: 255 , unique: true)]
-    private $username;
+    public $username;
 
     #[ORM\Column(type: 'datetime')]
     private $createdAt;
@@ -127,6 +145,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: 'boolean' )]
     private $confirmed;
+
+
+    // public function __construct($username, array $roles, $email)
+    // {
+    //     $this->username = $username;
+    //     $this->roles = $roles;
+    //     $this->email = $email;
+    // }
 
 
     public function getId(): ?int
@@ -244,5 +270,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->confirmed = $confirmed;
 
         return $this;
+    }
+
+    public static function createFromPayload($username, array $payload)
+    {
+       $user = new User();
+       $user->setUsername($username);
+       return $user;
     }
 }

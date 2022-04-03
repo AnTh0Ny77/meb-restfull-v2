@@ -25,6 +25,12 @@ class OpenApiFactory implements OpenApiFactoryInterface
         $openApi = $openApi->withInfo((new Model\Info('API MY Explore Bag', 'v2', 'ABSYSTEMS'))->withExtensionProperty('info-key', 'Info value'));
 
 
+        $schemas = $openApi->getComponents()->getSecuritySchemes();
+        $schemas['bearerAuth'] = new ArrayObject([
+            'type' => 'http',
+            'scheme' => 'bearer',
+            'bearerForamt' => 'JWT'
+        ]);
 
         $schema = $openApi->getComponents()->getSchemas();
 
@@ -126,7 +132,7 @@ class OpenApiFactory implements OpenApiFactoryInterface
         );
 
         $openApi->getPaths()->addPath('/api/login', $pathItem);
-        $openApi->getPaths()->addPath('/api/refresh', $resfreshPath);
+        $openApi->getPaths()->addPath('/api/token/refresh', $resfreshPath);
 
         return $openApi;
     }

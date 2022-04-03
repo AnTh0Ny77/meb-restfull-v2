@@ -34,12 +34,16 @@ class SecurityController extends AbstractController
     public function loginLink(UserRepository $userRepository , $username , LoginLinkHandlerInterface  $loginLinkHandler )
     {
             $user = $userRepository->findOneBy(['username' => $username]);
+           
             $loginLinkDetails = $loginLinkHandler->createLoginLink($user);
+       
             $loginLink = $loginLinkDetails->getUrl();
+       
             $response = [
                 "link" => $loginLink
             ];
             $data = new JsonResponse($response, '201');
+           
             return  $data;
     }
 }

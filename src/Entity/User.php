@@ -9,6 +9,7 @@ use App\Repository\UserRepository;
 use App\Controller\PostGuestController;
 use App\Controller\ConfirmGuestController;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 use App\Controller\MeController;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -68,6 +69,41 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
                 
                 ]
                
+            ],
+            "confirm" => [
+                'method' => 'put',
+                'path' => 'user/guest/confirm',
+                'controller' => ConfirmGuestController::class,
+                'openapi_context' => [
+                    'security' =>
+                    [['bearerAuth' => []]],
+                    'summary'     => 'Update de guest account to classic user account',
+                    'description' => '',
+                    'requestBody' => [
+                        'content' => [
+                            'application/json' => [
+                                'schema'  => [
+                                    'type'       => 'object',
+                                    'properties' =>
+                                    [
+                                        'username' => ['type' => 'string'],
+                                        'email'  => ['type' => 'string'] , 
+                                        'password' => ['type' => 'string'] , 
+                                        'name' =>  ['type' => 'string']  ,
+                                        'firstname' => ['type' => 'string'] 
+                                    ],
+                                ],
+                                'example' => [
+                                    'username'     => '3xCh4ng3',
+                                    'email'        => 'johndoe@yahoo.fr',
+                                    'password'  => 'securiTYY1234',
+                                    'name' => 'Doe',
+                                    'firstname' => 'john'
+                                ],
+                            ],
+                        ]
+                    ]
+                ]
             ]
         ],
         itemOperations: [ 
@@ -75,17 +111,6 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
                 'controller' => NotFoundAction::class ,
                 'read' => false ,
                 'output' => false
-            ],
-            "confirm" => [
-                'method' => 'put',
-                'path' => 'user/guest/confirm/{id}',
-                'controller' => ConfirmGuestController::class,
-                'openapi_context' => [
-                    'security' =>
-                    [['bearerAuth' => []]],
-                    'summary'     => 'Update de guest account to classic user account'
-                ],
-                'denormalization_context' => ['groups' => ['put:User']]
             ]
         ]
 )]
@@ -135,6 +160,38 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
 
     #[ORM\Column(type: 'boolean' )]
     private $confirmed;
+
+    /**
+     * @Assert\Length(
+     *      min = 3,
+     *      max = 70,
+     *      minMessage = "Your name must be at least {{ limit }} characters long",
+     *      maxMessage = "Your name cannot be longer than {{ limit }} characters"
+     * )
+     */
+    #[ORM\Column(type: 'string', length: 100, nullable: true)]
+    private $name;
+
+    /**
+     * @Assert\Length(
+     *      min = 3,
+     *      max = 70,
+     *      minMessage = "Your name must be at least {{ limit }} characters long",
+     *      maxMessage = "Your name cannot be longer than {{ limit }} characters"
+     * )
+     */
+    #[ORM\Column(type: 'string', length: 100, nullable: true)]
+    private $firstName;
+
+    /**
+     * @SerializedName("password")
+     * @Assert\Regex(
+     *     pattern="/^(?=.*[0-9])(?=.*[A-Z]).{8,20}$/",
+     *     match=true,
+     *     message="Your password must be : 8 characters minimun . must contain 1 number , 1 uppercase  and 1 lowercase character "
+     * )
+     */
+    private $PlainPassword;
 
    
 
@@ -274,6 +331,42 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
        $user = new User();
        $user->setUsername($username);
        return $user;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(?string $name): self
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    public function getFirstName(): ?string
+    {
+        return $this->firstName;
+    }
+
+    public function setFirstName(?string $firstName): self
+    {
+        $this->firstName = $firstName;
+
+        return $this;
+    }
+
+    public function getPlainPassword(): ?string
+    {
+        return $this->PlainPassword;
+    }
+
+    public function setPlainPassword(string $PlainPassword): self
+    {
+        $this->PlainPassword = $PlainPassword;
+
+        return $this;
     }
 
   

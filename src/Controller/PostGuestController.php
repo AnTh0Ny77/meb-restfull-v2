@@ -68,7 +68,7 @@ class PostGuestController extends AbstractController
                         'username' => $guest_name,
                         'loginLinkHandler' => $loginLinkHandler
                     ]);
-                dd($request_link);
+               
                     $link = json_decode($request_link->getContent());
                 
                     $link = $link->link;

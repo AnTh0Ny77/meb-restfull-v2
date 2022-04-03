@@ -26,16 +26,77 @@ class ConfirmGuestController extends AbstractController
         $this->security = $security;
     }
 
-   
+    public function json_response(string $code, string $message)
+    {
+        $response = [
+            "error" => $message,
+        ];
+        $data = new JsonResponse($response, $code);
+        return $data;
+    }
 
-    public function __invoke(Request $request, ValidatorInterface $validator, UserPasswordHasherInterface $hasher)
+
+    public function __invoke(Request $request, ValidatorInterface $validator, UserRepository $ur,  UserPasswordHasherInterface $hasher)
     {
 
-
         $user = $this->security->getUser();
-        $identifier = $request->attributes->get('data');
-        $content = json_decode($request->getContent(), true);
-        dd($user);
+        if (empty($user)) {
+            return $this->json_response('401', 'JWT Token  not found');
+        }
+        $user = $ur->findOneBy(array('username' => $user->username));
+
+        if (!$user instanceof User) {
+            return $this->json_response('401', 'user not found');
+        } else {
+            $content = json_decode($request->getContent(), true);
+            
+            if (empty($content['username'])) {
+                return $this->json_response('400', 'username required');
+            }
+            elseif (empty($content['email'])) {
+                return $this->json_response('400', 'email required');
+            }
+            elseif (empty($content['password'])) {
+                return $this->json_response('400', 'password required');
+            }
+            elseif (empty($content['name'])) {
+                return $this->json_response('400', 'name required');
+            }
+            elseif (empty($content['firstname'])) {
+                return $this->json_response('400', 'firstname required');
+            }else{
+                $user->setEmail($content['email']);
+                $user->setUsername($content['username']);
+                $user->setName($content['name']);
+                $user->setPlainPassword($content['password']);
+                $user->setFirstName($content['firstname']);
+                $user->setConfirmed(1);
+                $errors = $validator->validate($user);
+                if (count($errors) > 0) {
+                    $errorsString = (string) $errors;
+                    $response = [
+                        "error" => $errorsString,
+
+                    ];
+                    $data = new JsonResponse($response, '401');
+                    return $data;
+                }else{
+                    $pass = $hasher->hashPassword($user, $user->getPlainPassword());
+                    $user->setPassword($pass);
+                    $this->em->persist($user);
+                    $this->em->flush();
+                    $response = [
+                        "response" => "user has been updated",
+
+                    ];
+                    $data = new JsonResponse($response, '200');
+                    return $data;
+                }
+               
+            }
+        }
+        
+       
 
 
     }

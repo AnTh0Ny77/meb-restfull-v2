@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
 use App\Controller\PostGuestController;
@@ -146,6 +148,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
     #[ORM\Column(type: 'boolean' )]
     private $confirmed;
 
+   
+
+    public function __construct()
+    {
+        $this->secret = new ArrayCollection();
+    }
+
 
     // public function __construct($username, array $roles, $email)
     // {
@@ -278,4 +287,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
        $user->setUsername($username);
        return $user;
     }
+
+  
+
 }

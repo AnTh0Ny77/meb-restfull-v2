@@ -10,7 +10,9 @@ use App\Controller\PostGuestController;
 use App\Controller\ConfirmGuestController;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Component\HttpFoundation\File\File;
 use Doctrine\Common\Collections\ArrayCollection;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\SerializedName;
@@ -148,6 +150,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 /**
 * @UniqueEntity( "email" )
 * @UniqueEntity( "username" )
+* @Vich\Uploadable
 */
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUserInterface
@@ -227,7 +230,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $CoverPath;
 
-   
+    /**
+     * @var File|null
+     * @Assert\File(
+     *     maxSize = "2048k",
+     *     mimeTypes = {"image/jpeg", "image/png"},
+     *     mimeTypesMessage = "Please upload a valid cover image: jpeg or png under 2048k")
+     * @Vich\UploadableField(mapping="user_cover", fileNameProperty="CoverPath")
+     */
+    private $file;
 
     public function __construct()
     {
@@ -415,6 +426,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
         return $this;
     }
 
-  
 
+    /**
+     * Get maxSize = "2048k",
+     *
+     * @return  File|null
+     */ 
+    public function getFile()
+    {
+        return $this->file;
+    }
+
+    /**
+     * Set maxSize = "2048k",
+     *
+     * @param  File|null  $file  maxSize = "2048k",
+     *
+     * @return  self
+     */ 
+    public function setFile($file)
+    {
+        $this->file = $file;
+
+        return $this;
+    }
 }

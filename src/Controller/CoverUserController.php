@@ -1,19 +1,21 @@
 <?php
 namespace App\Controller;
+use DateTime;
 use App\Entity\User;
 use App\Entity\Games;
 use App\Entity\QrCode;
 use App\Entity\UnlockGames;
-use App\Repository\GamesRepository;
 use App\Repository\UserRepository;
-use App\Repository\QrCodeRepository;
+use App\Repository\GamesRepository;
 use App\Repository\QuestRepository;
+use App\Repository\QrCodeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\UnlockGamesRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 
@@ -37,7 +39,7 @@ class CoverUserController extends AbstractController
 
 
 
-    public function __invoke(Request $request, GamesRepository $gr, QuestRepository $questRep, UserRepository $ur, UnlockGamesRepository $urRep)
+    public function __invoke(Request $request, ValidatorInterface $validator, UserRepository $ur, UnlockGamesRepository $urRep)
     {
         $user = $this->security->getUser();
         if (empty($user)){
@@ -57,11 +59,30 @@ class CoverUserController extends AbstractController
                 if ($subject !=  $user) {
                     return $this->json_response('403', 'cannot handle other user ');
                 }else{
-                    $file = $request->files->get('cover');
-                    dd($file);
+                    $user->setFile($request->files->get('cover'));
+                    $user->setUpdatedAt(new DateTime('now'));
+                    $errors = $validator->validate($user);
+                    if (count($errors) > 0) {
+                        $errorsString = (string) $errors;
+                        $response = [
+                            "error" => $errorsString,
+
+                        ];
+                        $data = new JsonResponse($response, '401');
+                        return $data;
+                    } else{
+                        $this->em->persist($user);
+                        $this->em->flush();
+                        $response = [
+                            "message" => 'cover has been updated',
+                            'cover ' =>  $user->getCoverPath()
+                        ];
+                        $data = new JsonResponse($response, '401');
+                        return  $data;
+                    }
+                    
                 }
 
-                return $user;
             }
         }
     }

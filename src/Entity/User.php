@@ -2,17 +2,18 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use App\Controller\MeController;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
+use App\Controller\CoverUserController;
 use App\Controller\PostGuestController;
 use App\Controller\ConfirmGuestController;
+use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
-use Symfony\Component\Serializer\Annotation\SerializedName;
-use App\Controller\MeController;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Lexik\Bundle\JWTAuthenticationBundle\Security\User\JWTUserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -130,6 +131,17 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
                 'controller' => NotFoundAction::class ,
                 'read' => false ,
                 'output' => false
+            ],
+            'cover' => [
+                'method' => 'post',
+                'path' => 'user/{id}/cover',
+                'deserialize'=> false,
+                'controller' => CoverUserController::class,
+                'openapi_context' => [
+                    'security' =>
+                    [['bearerAuth' => []]],
+                    'summary'     => 'Post the user cover image ( need an definitive account : api/user/guest/confirm )',
+                ]
             ]
         ]
 )]
@@ -211,6 +223,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
      * )
      */
     private $PlainPassword;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $CoverPath;
 
    
 
@@ -384,6 +399,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
     public function setPlainPassword(string $PlainPassword): self
     {
         $this->PlainPassword = $PlainPassword;
+
+        return $this;
+    }
+
+    public function getCoverPath(): ?string
+    {
+        return $this->CoverPath;
+    }
+
+    public function setCoverPath(?string $CoverPath): self
+    {
+        $this->CoverPath = $CoverPath;
 
         return $this;
     }

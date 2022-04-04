@@ -35,7 +35,7 @@ use ApiPlatform\Core\Annotation\ApiResource;
                 ],
                 'description' => 'simule la creation d un qrcode et renvoi son contenu',
                 'security' => [['bearerAuth' => []]],
-                'summary' => 'Only available during development',
+                'summary' => 'available only during development',
                 "responses" => [
                     "201" => [
                         "description" => "The Qrcode has been created",

@@ -15,12 +15,17 @@ use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-class MeController extends AbstractController
+
+
+
+class CoverUserController extends AbstractController
 {
 
-    public function __construct(private Security $security)
+
+    public function __construct(private Security $security, private EntityManagerInterface $em)
     {
     }
+
     public function json_response(string $code, string $message)
     {
         $response = [
@@ -30,10 +35,12 @@ class MeController extends AbstractController
         return $data;
     }
 
+
+
     public function __invoke(Request $request, GamesRepository $gr, QuestRepository $questRep, UserRepository $ur, UnlockGamesRepository $urRep)
     {
         $user = $this->security->getUser();
-        if (empty($user)) {
+        if (empty($user)){
             return $this->json_response('401', 'JWT Token  not found');
         }
 
@@ -44,7 +51,16 @@ class MeController extends AbstractController
 
             if ($user->getConfirmed() != true) {
                 return $this->json_response('400', 'user need to be confirmed , see: api/user/guest/confirm');
-            } else {
+            }else{
+                
+                $subject = $request->attributes->get('data');
+                if ($subject !=  $user) {
+                    return $this->json_response('403', 'cannot handle other user ');
+                }else{
+                    $file = $request->files->get('cover');
+                    dd($file);
+                }
+
                 return $user;
             }
         }

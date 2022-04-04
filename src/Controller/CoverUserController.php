@@ -10,6 +10,7 @@ use App\Repository\GamesRepository;
 use App\Repository\QuestRepository;
 use App\Repository\QrCodeRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
 use App\Repository\UnlockGamesRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Security;
@@ -39,7 +40,7 @@ class CoverUserController extends AbstractController
 
 
 
-    public function __invoke(Request $request, ValidatorInterface $validator, UserRepository $ur, UnlockGamesRepository $urRep)
+    public function __invoke(Request $request, ValidatorInterface $validator, UserRepository $ur, UnlockGamesRepository $urRep , UploaderHelper $helper )
     {
         $user = $this->security->getUser();
         if (empty($user)){
@@ -73,9 +74,13 @@ class CoverUserController extends AbstractController
                     } else{
                         $this->em->persist($user);
                         $this->em->flush();
+                        $path =  'public' .$helper->asset($user, 'file');
+                        $user->setCoverPath($path);
+                        $this->em->persist($user);
+                        $this->em->flush();
                         $response = [
                             "message" => 'cover has been updated',
-                            'cover ' =>  $user->getCoverPath()
+                            'cover ' =>  $path
                         ];
                         $data = new JsonResponse($response, '401');
                         return  $data;

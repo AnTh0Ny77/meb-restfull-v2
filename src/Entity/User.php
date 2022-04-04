@@ -10,6 +10,7 @@ use App\Controller\PostGuestController;
 use App\Controller\ConfirmGuestController;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use App\Controller\UpdatePasswordController;
 use Symfony\Component\HttpFoundation\File\File;
 use Doctrine\Common\Collections\ArrayCollection;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
@@ -141,47 +142,104 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
                 'deserialize'=> false,
                 'controller' => CoverUserController::class,
                 'openapi_context' => [
-                    'security' =>
-                    [['bearerAuth' => []]],
-                    'summary'     => 'Post the user cover image ( need an definitive account : api/user/guest/confirm ) please use : multipart/form-data',
-                'requestBody' => [
-                    'content' => [
-                        'multipart/form-data' => [
-                            'schema' => [
-                                'type' => 'object',
-                                'properties' => [
-                                    'cover' => [
-                                        'type' => 'string',
-                                        'format' => 'biniray'
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ]
-
-                ], "responses" => [
-                    "201" => [
-                        "description" => "cover has been updated",
-                        "content" => [
-                            "application/json" => [
-                                "schema" =>  [
-                                    "properties" => [
-                                        "message" => [
-                                            "type" => "string"
-                                        ],
-                                        "cover" => [
-                                            "type" => "string"
+                        'security' =>
+                        [['bearerAuth' => []]],
+                        'summary'     => 'Post the user cover image ( need an definitive account : api/user/guest/confirm ) please use : multipart/form-data',
+                    'requestBody' => [
+                        'content' => [
+                            'multipart/form-data' => [
+                                'schema' => [
+                                    'type' => 'object',
+                                    'properties' => [
+                                        'cover' => [
+                                            'type' => 'string',
+                                            'format' => 'biniray'
                                         ]
                                     ]
                                 ]
                             ]
                         ]
-                    ],
-                    "401" => [
-                        "description" => "invalid request"
+
+                    ], "responses" => [
+                        "201" => [
+                            "description" => "cover has been updated",
+                            "content" => [
+                                "application/json" => [
+                                    "schema" =>  [
+                                        "properties" => [
+                                            "message" => [
+                                                "type" => "string"
+                                            ],
+                                            "cover" => [
+                                                "type" => "string"
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ],
+                        "401" => [
+                            "description" => "invalid request"
+                        ]
                     ]
                 ]
-                ]
+            ],'updatePassword' =>[
+                'pagination_enabeld' => false,
+                'deserialize' => false,
+                'path' => '/user/{id}/password',
+                'method' => 'PUT',
+                'controller' => UpdatePasswordController::class,
+                'openapi_context' => [
+                    'security' => [['bearerAuth' => []]],
+                    'summary' => 'Update the user password',
+                    'requestBody' => [
+                        'content' => [
+                            'application/json' => [
+                                'schema'  => [
+                                    'type'       => 'object',
+                                    'properties' =>
+                                    [
+                                        'password'  => ['type' => 'string'],
+                                        'actual_password' => ['type' => 'string']
+                                    ],
+                                ],
+                                'example' => [
+                                    'password'  => 'Security1234',
+                                    'actual_password' =>  'Security123'
+                                ],
+                            ]
+                        ]
+                    ], "responses" => [
+                        "200" => [
+                            "description" => "Password Updated",
+                            "content" => [
+                                "application/json" => [
+                                    "schema" =>  [
+                                        "properties" => [
+                                            "message" => [
+                                                "type" => "string"
+                                            ],
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ],
+                        "201" => [
+                            "description" => "Password Updated",
+                            "content" => [
+                                "application/json" => [
+                                    "schema" =>  [
+                                        "properties" => [
+                                            "message" => [
+                                                "type" => "string"
+                                            ],
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]   
+                    ]
+                ] 
             ]
         ]
 )]

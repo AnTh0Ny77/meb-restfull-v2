@@ -37,6 +37,7 @@ class PostGuestController extends AbstractController
       
         
             $user = new User;
+            
             $max = $this->ur->returnMaxGuest();
         
             if (!empty($max)) {

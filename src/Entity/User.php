@@ -9,6 +9,7 @@ use App\Controller\CoverUserController;
 use App\Controller\PostGuestController;
 use App\Controller\ConfirmGuestController;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Controller\UpdatePasswordController;
 use Symfony\Component\HttpFoundation\File\File;
@@ -75,6 +76,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
                 ]
                
             ],
+           
             "confirm" => [
                 'method' => 'put',
                 'path' => 'user/guest/confirm',
@@ -135,6 +137,14 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
                 'controller' => NotFoundAction::class ,
                 'read' => false ,
                 'output' => false
+            ],
+            "put" => [
+                'openapi_context' => [
+                    'security' =>
+                    [['bearerAuth' => []]],
+                    'summary'     => 'Update the current user'
+                ],
+                'denormalization_context' => ['groups' => ['put:User']]
             ],
             'cover' => [
                 'method' => 'post',
@@ -261,6 +271,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
     *     message = "The email '{{ value }}' is not a valid email."
     * )
     */
+    #[Groups(['put:User'])]
     #[ORM\Column(type: 'string', length: 180, unique: true , nullable: true)]
     private $email;
 
@@ -280,6 +291,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
     * @Assert\NotBlank
     */
     #[ORM\Column(type: 'string', length: 255 , unique: true)]
+    #[Groups(['put:User'])]
     public $username;
 
     #[ORM\Column(type: 'datetime')]
@@ -300,6 +312,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
      * )
      */
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
+    #[Groups(['put:User'])]
     private $name;
 
     /**
@@ -311,6 +324,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
      * )
      */
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
+    #[Groups(['put:User'])]
     private $firstName;
 
     /**
@@ -338,6 +352,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
 
     public function __construct()
     {
+        $this->createdAt = new \DateTime("now");
         $this->secret = new ArrayCollection();
     }
 

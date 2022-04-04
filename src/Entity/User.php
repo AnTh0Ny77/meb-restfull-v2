@@ -36,10 +36,10 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
                 'controller' => PostGuestController::class,
                 'read' => true,
                 'openapi_context' => [
-                    'summary' => 'create a guest user',
+                    'summary' => 'create a guest user (merci de passer un objet json vide en body)',
                     'description' => 'The response contains the username and a connection link for the guest it can only be used once and its lifespan is 300 seconds, be careful to keep the refresh token. ',
                     'requestBody' => [
-                       
+                    'content' => []
                     ],
                     "responses" => [
                         "201" => [

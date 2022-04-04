@@ -52,8 +52,7 @@ use Doctrine\ORM\Mapping as ORM;
             'read' => false,
             'output' => false
         ]
-    ],
-    normalizationContext: ['groups' => ['read:Quest'], "enable_max_depth" => true]
+    ]
 )]
 class Quest
 {

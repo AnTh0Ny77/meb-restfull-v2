@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use PutUserController;
 use App\Controller\MeController;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
@@ -9,18 +10,18 @@ use App\Controller\CoverUserController;
 use App\Controller\PostGuestController;
 use App\Controller\ConfirmGuestController;
 use Doctrine\Common\Collections\Collection;
-use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Controller\UpdatePasswordController;
+use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\HttpFoundation\File\File;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Lexik\Bundle\JWTAuthenticationBundle\Security\User\JWTUserInterface;
-use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 #[ApiResource(
@@ -138,13 +139,56 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
                 'read' => false ,
                 'output' => false
             ],
-            "put" => [
+            "putUser" => [
+                'method' => 'put',
+                'path' => 'user/{id}',
+                'deserialize' => false,
+                'controller' => PutUserController::class,
                 'openapi_context' => [
                     'security' =>
                     [['bearerAuth' => []]],
-                    'summary'     => 'Update the current user'
+                    'summary'     => 'Update the current user',
+                    'requestBody' => [
+                        'content' => [
+                            'application/json' => [
+                            'schema'  => [
+                                'type'       => 'object',
+                                'properties' =>
+                                [
+                                    'username' => ['type' => 'string'],
+                                    'email'  => ['type' => 'string'],
+                                    'name' =>  ['type' => 'string'],
+                                    'firstname' => ['type' => 'string']
+                                ],
+                            ],
+                            'example' => [
+                                    'username'     => '3xCh4ng3',
+                                    'email'        => 'johndoe@yahoo.fr',
+                                    'name' => 'Doe',
+                                    'firstname' => 'john'
+                            ],
+                            ]
+                        ]
+                    ], "responses" => [
+                        "201" => [
+                            "description" => "user has been updated",
+                            "content" => [
+                                "application/json" => [
+                                    "schema" =>  [
+                                        "properties" => [
+                                            "message" => [
+                                                "type" => "string"
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ],
+                        "401" => [
+                            "description" => "invalid request"
+                        ]
+                    ]
                 ],
-                'denormalization_context' => ['groups' => ['put:User']]
             ],
             'cover' => [
                 'method' => 'post',
@@ -271,7 +315,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
     *     message = "The email '{{ value }}' is not a valid email."
     * )
     */
-    #[Groups(['put:User'])]
     #[ORM\Column(type: 'string', length: 180, unique: true , nullable: true)]
     private $email;
 
@@ -291,7 +334,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
     * @Assert\NotBlank
     */
     #[ORM\Column(type: 'string', length: 255 , unique: true)]
-    #[Groups(['put:User'])]
     public $username;
 
     #[ORM\Column(type: 'datetime')]
@@ -312,7 +354,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
      * )
      */
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
-    #[Groups(['put:User'])]
     private $name;
 
     /**
@@ -324,7 +365,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
      * )
      */
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
-    #[Groups(['put:User'])]
     private $firstName;
 
     /**

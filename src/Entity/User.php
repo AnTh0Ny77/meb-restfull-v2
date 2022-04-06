@@ -2,13 +2,13 @@
 
 namespace App\Entity;
 
-use PutUserController;
 use App\Controller\MeController;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
 use App\Controller\CoverUserController;
 use App\Controller\PostGuestController;
 use App\Controller\ConfirmGuestController;
+use App\Controller\PutUserController;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Controller\UpdatePasswordController;

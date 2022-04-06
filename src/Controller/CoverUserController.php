@@ -54,11 +54,6 @@ class CoverUserController extends AbstractController
             if ($user->getConfirmed() != true) {
                 return $this->json_response('400', 'user need to be confirmed , see: api/user/guest/confirm');
             }else{
-                
-                $subject = $request->attributes->get('data');
-                if ($subject !=  $user) {
-                    return $this->json_response('403', 'cannot handle other user ');
-                }else{
                     $user->setFile($request->files->get('cover'));
                     if (!$request->files->get('cover') instanceof File) {
                         return $this->json_response('403', 'cover cannot be empty');
@@ -84,12 +79,9 @@ class CoverUserController extends AbstractController
                             "message" => 'cover has been updated',
                             'cover ' =>  $path
                         ];
-                        $data = new JsonResponse($response, '401');
+                        $data = new JsonResponse($response, '201');
                         return  $data;
                     }
-                    
-                }
-
             }
         }
     }

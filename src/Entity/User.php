@@ -131,7 +131,54 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
                         ]
                     ]
                 ]
+            ], 'cover' => [
+            'method' => 'post',
+            'path' => 'user/{id}/cover',
+            'deserialize' => false,
+            'controller' => CoverUserController::class,
+            'openapi_context' => [
+                'security' =>
+                [['bearerAuth' => []]],
+                'summary'     => 'Post the user cover image ( need an definitive account : api/user/guest/confirm ) please use : multipart/form-data',
+                'requestBody' => [
+                    'content' => [
+                        'multipart/form-data' => [
+                            'schema' => [
+                                'type' => 'object',
+                                'properties' => [
+                                    'cover' => [
+                                        'type' => 'string',
+                                        'format' => 'biniray'
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+
+                ], "responses" => [
+                    "201" => [
+                        "description" => "cover has been updated",
+                        "content" => [
+                            "application/json" => [
+                                "schema" =>  [
+                                    "properties" => [
+                                        "message" => [
+                                            "type" => "string"
+                                        ],
+                                        "cover" => [
+                                            "type" => "string"
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    "401" => [
+                        "description" => "invalid request"
+                    ]
+                ]
             ]
+        ]
         ],
         itemOperations: [ 
             'get' => [
@@ -190,54 +237,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
                     ]
                 ],
             ],
-            'cover' => [
-                'method' => 'post',
-                'path' => 'user/{id}/cover',
-                'deserialize'=> false,
-                'controller' => CoverUserController::class,
-                'openapi_context' => [
-                        'security' =>
-                        [['bearerAuth' => []]],
-                        'summary'     => 'Post the user cover image ( need an definitive account : api/user/guest/confirm ) please use : multipart/form-data',
-                    'requestBody' => [
-                        'content' => [
-                            'multipart/form-data' => [
-                                'schema' => [
-                                    'type' => 'object',
-                                    'properties' => [
-                                        'cover' => [
-                                            'type' => 'string',
-                                            'format' => 'biniray'
-                                        ]
-                                    ]
-                                ]
-                            ]
-                        ]
-
-                    ], "responses" => [
-                        "201" => [
-                            "description" => "cover has been updated",
-                            "content" => [
-                                "application/json" => [
-                                    "schema" =>  [
-                                        "properties" => [
-                                            "message" => [
-                                                "type" => "string"
-                                            ],
-                                            "cover" => [
-                                                "type" => "string"
-                                            ]
-                                        ]
-                                    ]
-                                ]
-                            ]
-                        ],
-                        "401" => [
-                            "description" => "invalid request"
-                        ]
-                    ]
-                ]
-            ],'updatePassword' =>[
+            'updatePassword' =>[
                 'pagination_enabeld' => false,
                 'deserialize' => false,
                 'path' => '/user/{id}/password',

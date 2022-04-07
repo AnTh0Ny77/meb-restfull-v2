@@ -187,8 +187,8 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
                 'output' => false
             ],
             "putUser" => [
-                'method' => 'put',
-                'path' => 'user/{id}',
+                'method' => 'PUT',
+                'path' => 'user/{id}/update',
                 'deserialize' => false,
                 'controller' => PutUserController::class,
                 'openapi_context' => [

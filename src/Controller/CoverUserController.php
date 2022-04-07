@@ -71,7 +71,7 @@ class CoverUserController extends AbstractController
                     } else{
                         $this->em->persist($user);
                         $this->em->flush();
-                        $path =  'public' .$helper->asset($user, 'file');
+                        $path =  '' .$helper->asset($user, 'file');
                         $user->setCoverPath($path);
                         $this->em->persist($user);
                         $this->em->flush();

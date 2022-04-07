@@ -5,10 +5,11 @@ namespace App\Entity;
 use App\Controller\MeController;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
+use App\Controller\PutUserController;
+use App\Controller\GetCoverController;
 use App\Controller\CoverUserController;
 use App\Controller\PostGuestController;
 use App\Controller\ConfirmGuestController;
-use App\Controller\PutUserController;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Controller\UpdatePasswordController;
@@ -235,6 +236,17 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
                             "description" => "invalid request"
                         ]
                     ]
+                ],
+            ], 
+            "GetCover" => [
+                'method' => 'Get',
+                'path' => 'user/{id}/cover',
+                'deserialize' => false,
+                'controller' => GetCoverController::class,
+                'openapi_context' => [
+                    'security' =>
+                    [['bearerAuth' => []]],
+                    'summary'     => 'Get the current user s cover'
                 ],
             ],
             'updatePassword' =>[

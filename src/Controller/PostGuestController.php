@@ -75,7 +75,7 @@ class PostGuestController extends AbstractController
                     $link = $link->link;
                     $response = [
                         "message" => 'The guest has been created',
-                        "user name" => $user->getUsername() , 
+                        "username" => $user->getUsername() , 
                         "link" => $link
                     ];
                     $data = new JsonResponse($response, '201');

@@ -2,12 +2,13 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\GamesRepository;
+use App\Controller\GetCoverGamesController;
+use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Controller\GetUnlockedGamesController;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: GamesRepository::class)]
@@ -24,7 +25,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
         'unlock' => [
             'pagination_enabeld' => false,
             'method' => 'get',
-            'path' => 'game/unlocked',
+            'path' => 'games/unlocked',
             'controller' => GetUnlockedGamesController::class,
             'read' => true,
             'openapi_context' => [
@@ -61,7 +62,26 @@ use Symfony\Component\Serializer\Annotation\Groups;
                 'summary' => 'public - retrieves a single game',
             ],
             'normalization_context' => ['groups' => ['read:Games']]
-        ]
+        ], "GetCover" => [
+            'method' => 'Get',
+            'path' => 'games/{id}/cover',
+            'deserialize' => false,
+            'controller' => GetCoverGamesController::class,
+            'openapi_context' => [
+                'summary'     => 'public request Get the game s cover',
+                'description' => '',
+                "responses" => [
+                    "200" => [
+                        "description" => "file",
+                        "content" => [
+                            "text/plain" => [
+                                "schema" =>  []
+                            ]
+                        ]
+                    ],
+                ]
+            ],
+        ],
     ],
     normalizationContext: ['groups' => ['read:Games'], "enable_max_depth" => true]
 )]

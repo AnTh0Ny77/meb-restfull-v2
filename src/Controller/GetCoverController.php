@@ -63,6 +63,7 @@ class GetCoverController extends AbstractController
                 $filesystem = new Filesystem();
                     if (!empty($user->getCoverPath())) {
                         $path = substr($user->getCoverPath(), 1);
+                        
                         if ($filesystem->exists($path)){
                             $stream  = new Stream($path);
                             $response = new BinaryFileResponse($stream);

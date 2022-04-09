@@ -106,6 +106,7 @@ class Games
     private $CoverPath;
 
     #[ORM\OneToMany(mappedBy: 'game', targetEntity: Quest::class, orphanRemoval: true)]
+    #[Groups(['read:Games'])]
     private $quests;
 
     public function __construct()

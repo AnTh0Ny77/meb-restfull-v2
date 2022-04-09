@@ -334,6 +334,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(['read:User'])]
     private $id;
 
     /**

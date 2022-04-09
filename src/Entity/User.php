@@ -32,6 +32,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
                 'path' => 'user/me',
                 'method' => 'get',
                 'controller' => MeController::class,
+                'normalization_context' => ['groups' => 'read:User'],
                 'read' => false,
                 'openapi_context' => [
                     'security' => [['bearerAuth' => []]]
@@ -328,9 +329,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
     * )
     */
     #[ORM\Column(type: 'string', length: 180, unique: true , nullable: true)]
+    #[Groups(['read:User'])]
     private $email;
 
     #[ORM\Column(type: 'json')]
+    #[Groups(['read:User'])]
     private $roles = [];
 
     #[ORM\Column(type: 'string' , nullable: true)]
@@ -346,15 +349,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
     * @Assert\NotBlank
     */
     #[ORM\Column(type: 'string', length: 255 , unique: true)]
+    #[Groups(['read:User'])]
     public $username;
 
     #[ORM\Column(type: 'datetime')]
     private $createdAt;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
+    #[Groups(['read:User'])]
     private $updatedAt;
 
     #[ORM\Column(type: 'boolean' )]
+    #[Groups(['read:User'])]
     private $confirmed;
 
     /**
@@ -366,6 +372,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
      * )
      */
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
+    #[Groups(['read:User'])]
     private $name;
 
     /**
@@ -377,6 +384,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
      * )
      */
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
+    #[Groups(['read:User'])]
     private $firstName;
 
     /**
@@ -390,6 +398,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
     private $PlainPassword;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['read:User'])]
     private $CoverPath;
 
     /**

@@ -247,7 +247,20 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
                 'openapi_context' => [
                     'security' =>
                     [['bearerAuth' => []]],
-                    'summary'     => 'Get the current user s cover'
+                    'summary'     => 'Get the current user s cover',
+                     'description' => '',
+                        "responses" => [
+                            "200" => [
+                                "description" => "file",
+                                "content" => [
+                                    "text/plain" => [
+                                        "schema" =>  [
+                                            
+                                        ]
+                                    ]
+                                ]
+                            ],
+                        ]
                 ],
             ],
             'updatePassword' =>[

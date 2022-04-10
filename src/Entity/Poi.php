@@ -2,13 +2,18 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use App\Repository\PoiRepository;
-use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\PoiRepository;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use App\Controller\GetImageClueController;
+use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 #[ORM\Entity(repositoryClass: PoiRepository::class)]
+#[ApiFilter(SearchFilter::class, properties: ['Quest' => 'exact'])]
 #[ApiResource(
+    order: ["Step" => "ASC"],
     collectionOperations: [
         'get' => [
             'pagination_enabeld' => false,
@@ -27,6 +32,35 @@ use Doctrine\ORM\Mapping as ORM;
             'openapi_context' => [
                 'summary' => 'public - retrieves a single Poi ',
             ]
+        ], 'getClue' => [
+            'pagination_enabeld' => false,
+            'path' => '/Poi/{id}/Clue',
+            'method' => 'get',
+            'normalization_context' => ['groups' => 'read:Clue'],
+            'openapi_context' => [
+                'security' => [['bearerAuth' => []]],
+                'summary' => 'get the Clue',
+            ]
+        ],'getImageClue' => [
+            'pagination_enabeld' => false,
+            'path' => '/Poi/{id}/ImageClue',
+            'controller' => GetImageClueController::class,
+            'read' => true,
+            'method' => 'get',
+            'openapi_context' => [
+                'security' => [['bearerAuth' => []]],
+                'summary' => 'get the image Clue',
+                "responses" => [
+                    "200" => [
+                        "description" => "file",
+                        "content" => [
+                            "text/plain" => [
+                                "schema" =>  []
+                            ]
+                        ]
+                    ],
+                ]
+            ]
         ]
     ]
 )]
@@ -39,7 +73,7 @@ class Poi
     private $id;
 
     #[ORM\Column(type: 'string', length: 100)]
-    #[Groups(['read:Quest', 'read:oneQuest', 'read:Poi'])]
+    #[Groups(['read:Quest', 'read:oneQuest', 'read:Poi' , 'read:Clue'])]
     private $Name;
 
     #[ORM\Column(type: 'json')]
@@ -55,13 +89,21 @@ class Poi
     private $Text;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(['read:Poi'])]
+    #[Groups(['read:Clue'])]
     private $clue;
 
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
-    #[Groups(['read:Poi'])]
     private $ImageClue;
 
+    #[ORM\Column(type: 'smallint', nullable: true)]
+    #[Groups(['read:Quest', 'read:oneQuest', 'read:Poi'])]
+    private $Step;
+
+    #[ORM\ManyToOne(targetEntity: TypePoi::class, inversedBy: 'Poi')]
+    #[Groups(['read:Poi'])]
+    private $typePoi;
+
+   
     public function getId(): ?int
     {
         return $this->id;
@@ -138,4 +180,30 @@ class Poi
 
         return $this;
     }
+
+    public function getStep(): ?int
+    {
+        return $this->Step;
+    }
+
+    public function setStep(?int $Step): self
+    {
+        $this->Step = $Step;
+
+        return $this;
+    }
+
+    public function getTypePoi(): ?TypePoi
+    {
+        return $this->typePoi;
+    }
+
+    public function setTypePoi(?TypePoi $typePoi): self
+    {
+        $this->typePoi = $typePoi;
+
+        return $this;
+    }
+
+  
 }

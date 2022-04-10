@@ -1,0 +1,64 @@
+<?php
+
+namespace App\Controller;
+
+use App\Entity\Poi;
+use App\Entity\User;
+use App\Entity\Games;
+use App\Entity\QrCode;
+use App\Entity\UnlockGames;
+use App\Repository\UserRepository;
+use App\Repository\GamesRepository;
+use App\Repository\QuestRepository;
+use App\Repository\QrCodeRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\UnlockGamesRepository;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Security;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\File\Stream;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
+class GetImageClueController extends AbstractController
+{
+
+    public function __construct(private Security $security)
+    {
+    }
+    public function json_response(string $code, string $message)
+    {
+        $response = [
+            "error" => $message,
+        ];
+        $data = new JsonResponse($response, $code);
+        return $data;
+    }
+
+    public function __invoke(Request $request, GamesRepository $gr, QuestRepository $questRep, UserRepository $ur, UnlockGamesRepository $urRep, UploaderHelper $helper)
+    {
+        $poi =  $request->get('data');
+
+        if (!$poi instanceof Poi) {
+            return $this->json_response('400', 'Unknow game');
+        }
+        if (empty($poi->getImageClue())) {
+            return $this->json_response('400', 'no image clue: ' . $poi->getName() . '');
+        }
+
+        $filesystem = new Filesystem();
+        $path = substr($poi->getImageClue(), 1);
+        if ($filesystem->exists($path)) {
+            $stream  = new Stream($path);
+            $response = new BinaryFileResponse($stream);
+            return $response;
+        } else {
+            return $this->json_response('400', 'no image clue: ' . $poi->getName() . '');
+        }
+    }
+}

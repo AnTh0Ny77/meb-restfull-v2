@@ -93,6 +93,9 @@ class Quest
     #[Groups([ 'read:oneQuest'])]
     private $poi;
 
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $ResponseQuest;
+
     public function __construct()
     {
         $this->poi = new ArrayCollection();
@@ -165,6 +168,18 @@ class Quest
                 $poi->setQuest(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getResponseQuest(): ?string
+    {
+        return $this->ResponseQuest;
+    }
+
+    public function setResponseQuest(?string $ResponseQuest): self
+    {
+        $this->ResponseQuest = $ResponseQuest;
 
         return $this;
     }

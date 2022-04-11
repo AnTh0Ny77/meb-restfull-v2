@@ -183,11 +183,11 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
         ]
         ],
         itemOperations: [ 
-            'get' => [
-                'controller' => NotFoundAction::class ,
-                'read' => false ,
-                'output' => false
-            ],
+            // 'get' => [
+            //     'controller' => NotFoundAction::class ,
+            //     'read' => false ,
+            //     'output' => false
+            // ],
             "putUser" => [
                 'method' => 'PUT',
                 'path' => 'user/{id}/update',

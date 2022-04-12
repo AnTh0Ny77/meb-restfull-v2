@@ -109,9 +109,13 @@ class Games
     #[Groups(['read:Games'])]
     private $quests;
 
+    #[ORM\ManyToMany(targetEntity: BagTools::class, mappedBy: 'Games')]
+    private $bagTools;
+
     public function __construct()
     {
         $this->quests = new ArrayCollection();
+        $this->bagTools = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -180,6 +184,33 @@ class Games
             if ($quest->getGame() === $this) {
                 $quest->setGame(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, BagTools>
+     */
+    public function getBagTools(): Collection
+    {
+        return $this->bagTools;
+    }
+
+    public function addBagTool(BagTools $bagTool): self
+    {
+        if (!$this->bagTools->contains($bagTool)) {
+            $this->bagTools[] = $bagTool;
+            $bagTool->addGame($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBagTool(BagTools $bagTool): self
+    {
+        if ($this->bagTools->removeElement($bagTool)) {
+            $bagTool->removeGame($this);
         }
 
         return $this;

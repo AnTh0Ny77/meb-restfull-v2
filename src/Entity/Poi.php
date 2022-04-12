@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\PoiRepository;
 use ApiPlatform\Core\Annotation\ApiFilter;
@@ -103,6 +105,14 @@ class Poi
     #[Groups(['read:Poi'])]
     private $typePoi;
 
+    #[ORM\OneToMany(mappedBy: 'Poi', targetEntity: Slide::class)]
+    private $slides;
+
+    public function __construct()
+    {
+        $this->slides = new ArrayCollection();
+    }
+
    
     public function getId(): ?int
     {
@@ -201,6 +211,36 @@ class Poi
     public function setTypePoi(?TypePoi $typePoi): self
     {
         $this->typePoi = $typePoi;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Slide>
+     */
+    public function getSlides(): Collection
+    {
+        return $this->slides;
+    }
+
+    public function addSlide(Slide $slide): self
+    {
+        if (!$this->slides->contains($slide)) {
+            $this->slides[] = $slide;
+            $slide->setPoi($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSlide(Slide $slide): self
+    {
+        if ($this->slides->removeElement($slide)) {
+            // set the owning side to null (unless already changed)
+            if ($slide->getPoi() === $this) {
+                $slide->setPoi(null);
+            }
+        }
 
         return $this;
     }

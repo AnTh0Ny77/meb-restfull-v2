@@ -26,6 +26,16 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
                 'security' => [['bearerAuth' => []]],
                 'summary' => 'retrieves a Slide collection',
             ]
+        ], 'getOutLine' => [
+            'pagination_enabeld' => false,
+            'path' => 'slides/offline',
+            'method' => 'get',
+            'security' => 'is_granted("ROLE_USER")',
+            'normalization_context' => ['groups' => 'read:Slide:Offline'],
+            'openapi_context' => [
+                'security' => [['bearerAuth' => []]],
+                'summary' => 'retrieves a Slide collection with response for Outline parts',
+            ]
         ]
     ],itemOperations:[
         'get' => [
@@ -154,44 +164,44 @@ class Slide
     private $id;
 
     #[ORM\Column(type: 'string', length: 100)]
-    #[Groups(['read:Slide'])]
+    #[Groups(['read:Slide' , 'read:Slide:Offline'])]
     private $Name;
 
     #[ORM\Column(type: 'text', nullable: true)]
-    #[Groups(['read:Slide'])]
+    #[Groups(['read:Slide' , 'read:Slide:Offline'])]
     private $Text;
 
     #[ORM\Column(type: 'text', nullable: true)]
-    #[Groups(['read:Slide'])]
+    #[Groups(['read:Slide', 'read:Slide:Offline'])]
     private $TextSuccess;
 
     #[ORM\Column(type: 'text', nullable: true)]
-    #[Groups(['read:Slide'])]
+    #[Groups(['read:Slide', 'read:Slide:Offline'])]
     private $TextFail;
 
     #[ORM\Column(type: 'integer', nullable: true)]
-    #[Groups(['read:Slide'])]
+    #[Groups(['read:Slide', 'read:Slide:Offline'])]
     private $Time;
 
     #[ORM\Column(type: 'integer', nullable: true)]
-    #[Groups(['read:Slide'])]
+    #[Groups(['read:Slide' , 'read:Slide:Offline'])]
     private $Step;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(['read:Slide'])]
+    #[Groups(['read:Slide', 'read:Slide:Offline'])]
     private $Response;
 
     #[ORM\Column(type: 'boolean')]
-    #[Groups(['read:Slide'])]
+    #[Groups(['read:Slide', 'read:Slide:Offline'])]
     private $Penality;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(['read:Slide'])]
+    #[Groups(['read:Slide', 'read:Slide:Offline'])]
     private $CoverPath;
 
     #[ORM\ManyToOne(targetEntity: Poi::class, inversedBy: 'slides')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['read:One:Slide'])]
+    #[Groups(['read:One:Slide' , 'read:Slide:Offline'])]
     private $Poi;
 
     #[ORM\ManyToOne(targetEntity: TypeSlide::class, inversedBy: 'Slide')]
@@ -200,6 +210,7 @@ class Slide
     private $typeSlide;
 
     #[ORM\Column(type: 'string', length: 150, nullable: true)]
+    #[Groups([ 'read:Slide:Offline'])]
     private $Solution;
 
     public function getId(): ?int

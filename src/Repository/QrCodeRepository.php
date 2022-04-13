@@ -62,6 +62,7 @@ class QrCodeRepository extends ServiceEntityRepository
     }
     */
 
+   
     
     // public function findUnlockedGames($value)
     // {

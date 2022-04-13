@@ -48,6 +48,10 @@ class GetCoverController extends AbstractController
         }
 
         $user = $ur->findOneBy(array('username' => $user->username));
+        $subject = $request->attributes->get('data');
+        if ($subject !=  $user) {
+            return $this->json_response('403', 'cannot handle other user ');
+        } 
         if (!$user instanceof User) {
             return $this->json_response('401', 'user not found');
         } else {

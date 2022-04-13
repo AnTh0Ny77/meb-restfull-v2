@@ -47,16 +47,14 @@ class CoverUserController extends AbstractController
         }
 
         $user = $ur->findOneBy(array('username' => $user->username));
-
-        if ($user != $request->get('data')) {
-            return $this->json_response('401', 'canot handle other users');
-        }
+       
         if (!$user instanceof User) {
             return $this->json_response('401', 'user not found');
         } else {
             if ($user->getConfirmed() != true) {
                 return $this->json_response('400', 'user need to be confirmed , see: api/user/guest/confirm');
             }else{
+                    
                     $user->setFile($request->files->get('cover'));
                     if (!$request->files->get('cover') instanceof File) {
                         return $this->json_response('403', 'cover cannot be empty');

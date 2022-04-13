@@ -135,7 +135,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
                 ]
             ], 'cover' => [
             'method' => 'post',
-            'path' => 'user/{id}/cover',
+            'path' => 'user/cover',
             'deserialize' => false,
             'controller' => CoverUserController::class,
             'openapi_context' => [

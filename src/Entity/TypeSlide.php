@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\TypeSlideRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TypeSlideRepository::class)]
@@ -13,12 +14,15 @@ class TypeSlide
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(['read:Slide'])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 100)]
+    #[Groups(['read:Slide'])]
     private $Name;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
+    #[Groups(['read:Slide'])]
     private $Color;
 
     #[ORM\OneToMany(mappedBy: 'typeSlide', targetEntity: Slide::class)]

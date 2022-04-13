@@ -2,9 +2,9 @@
 
 namespace App\Controller;
 
-use App\Entity\Poi;
 use App\Entity\User;
 use App\Entity\Games;
+use App\Entity\Slide;
 use App\Entity\QrCode;
 use App\Entity\UnlockGames;
 use App\Repository\UserRepository;
@@ -26,7 +26,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class GetImageClueController extends AbstractController
+class GetCoverSlideController extends AbstractController
 {
 
     public function __construct(private Security $security)
@@ -41,20 +41,20 @@ class GetImageClueController extends AbstractController
         return $data;
     }
 
-    public function __invoke(Request $request, GamesRepository $gr, QuestRepository $questRep, UserRepository $ur, UnlockGamesRepository $urRep, UploaderHelper $helper)
+    public function __invoke(Request $request)
     {
-        $poi =  $request->get('data');
+        $slide =  $request->get('data');
 
-        if (!$poi instanceof Poi) {
-            return $this->json_response('400', 'Unknow game');
+        if (!$slide instanceof Slide) {
+            return $this->json_response('400', 'Unknow slide');
         }
-        if (empty($poi->getImageClue())) {
-            return $this->json_response('400', 'no image clue: ' . $poi->getName() . '');
+        if (empty($slide->getCoverPath())) {
+            return $this->json_response('400', 'no cover for slide: ' . $slide->getName() . '');
         }
 
         $filesystem = new Filesystem();
-        $path = substr($poi->getImageClue(), 1);
-        if ($filesystem->exists($path)) {
+        $path = substr($slide->getCoverPath(), 1);
+        if ($filesystem->exists($path)){
             $mime = finfo_file(finfo_open(FILEINFO_MIME_TYPE), $path);
             $response = new Response();
             $disposition = $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_INLINE, basename($path));
@@ -66,7 +66,7 @@ class GetImageClueController extends AbstractController
             // $response = new BinaryFileResponse($stream);
             // return $response;
         } else {
-            return $this->json_response('400', 'no image clue: ' . $poi->getName() . '');
+            return $this->json_response('400', 'no cover for slide: ' . $slide->getName() . '');
         }
     }
 }

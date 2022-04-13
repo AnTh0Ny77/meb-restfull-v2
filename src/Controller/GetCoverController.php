@@ -12,9 +12,10 @@ use App\Repository\QuestRepository;
 use App\Repository\QrCodeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\UnlockGamesRepository;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Security;
-use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\File\Stream;
@@ -65,9 +66,16 @@ class GetCoverController extends AbstractController
                         $path = substr($user->getCoverPath(), 1);
                         
                         if ($filesystem->exists($path)){
-                            $stream  = new Stream($path);
-                            $response = new BinaryFileResponse($stream);
+                            $mime = finfo_file(finfo_open(FILEINFO_MIME_TYPE), $path);
+                            $response = new Response();
+                            $disposition = $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_INLINE, basename($path));
+                            $response->headers->set('Content-Disposition', $disposition);
+                            $response->headers->set('Content-Type', $mime);
+                            $response->setContent(file_get_contents($path));
                             return $response;
+                            // $stream  = new Stream($path);
+                            // $response = new BinaryFileResponse($stream);
+                            // return $response;
                         }else{
                             return $this->json_response('400', 'no cover for ' . $user->getUsername());
                         }

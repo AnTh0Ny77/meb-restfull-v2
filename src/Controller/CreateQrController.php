@@ -65,8 +65,7 @@ class CreateQrController extends AbstractController
             }else{
                    $key = $this->randomKey();
                    $date = new DateTime('now');
-                   $date = $date->format('y-m-d-H-i-s');
-                   $key = 'key-'. $date. '-' . $key;
+                   $key = ''. $key;
                    $qr = new QrCode();
                    $qr->setIdClient($user);
                    $qr->setSecret($key);
@@ -75,7 +74,7 @@ class CreateQrController extends AbstractController
                    $qr->setTime(3000);
                    $this->em->persist($qr);
                    $this->em->flush();
-                   $link = 'api/UnlockGame/unlock?secret='. $key;
+                   $link = '/api/UnlockGame/unlock?secret='. $key;
                    $response = [
                         "url" =>  $link,
                        

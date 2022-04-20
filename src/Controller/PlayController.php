@@ -59,14 +59,19 @@ class PlayController extends AbstractController
             if (empty($verify)) {
                 return $this->json_response('401', 'the game must be unlocked ');
             }
-            if ($slide->getTypeSlide()->getId() == 5 or $slide->getTypeSlide()->getId() == 6) {
-                return $this->json_response('400', 'please use the coorrect request for slide type: '. $slide->getTypeSlide()->getName().'');
+            if ( $slide->getTypeSlide()->getId() == 6) {
+                return $this->json_response('400', 'please use the correct request for slide type: '. $slide->getTypeSlide()->getName().'');
             }
            
            
             switch (intval($slide->getTypeSlide()->getId())) {
                 case 1:
                 case 3:
+                    $score = new Score();
+                    $score->setSlide($slide);
+                    $score->setUser($user);
+                    $score->setPoint(0);
+                    $score->setValue('');
                     $message = $slide->getTextSuccess();
                     $response = [
                         "message" => $message,
@@ -161,6 +166,48 @@ class PlayController extends AbstractController
                     $data = new JsonResponse($response, '200');
                     return $data;  
                    
+                    break;
+                case 5:
+                    if (empty($slide->getSolution())) {
+                        return $this->json_response('500', 'wrong data base configutation for slide type (empty response list)');
+                    }
+                    $answer = json_decode($request->getContent());
+                    if (empty($answer)) {
+                        return $this->json_response('400', 'answer cannot be null or empty ');
+                    }
+                    $true = false;
+                    if (intval($slide->getSolution()) == intval($answer->answer)) {
+                            $true = true;
+                    }
+                    if ($true) {
+                        $score = new Score();
+                        $score->setSlide($slide);
+                        $score->setUser($user);
+                        $message = $slide->getTextSuccess();
+                        $score->setPoint(1);
+                        $score->setValue($answer->answer);
+                    } else {
+                        $score = new Score();
+                        $score->setSlide($slide);
+                        $message = $slide->getTextFail();
+                        $score->setUser($user);
+                        if ($slide->getPenality()) {
+                            $score->setPoint(-1);
+                        } else {
+                            $score->setPoint(0);
+                        }
+
+                        $score->setValue($answer->answer);
+                    }
+                    $this->em->persist($score);
+                    $this->em->flush();
+                    $response = [
+                        "message" => $message,
+                        "score" => $score->getPoint()
+                    ];
+                    $data = new JsonResponse($response, '200');
+                    return $data;
+
                     break;
                 default:
                     return $this->json_response('500', 'wrong data base configutation for slide type');

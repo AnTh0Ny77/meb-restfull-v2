@@ -8,6 +8,7 @@ use App\Entity\BagTools;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Security;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\File\Stream;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
@@ -43,23 +44,32 @@ class GetQCMPController extends AbstractController
        
         $filesystem = new Filesystem();
         $Response = $slide->getResponse();
-        $Response =  explode(';', $Response);
-
-        
-       
-        foreach ($Response as $image) {
-            $path = substr($image, 1);
-           
-            if ($filesystem->exists($path)){
+        $index = json_decode($request->getContent());
+        if (empty($index)) {
+            return $this->json_response('400', 'index cannot be empty ');
+        }
+        $bool = false;
+        foreach ($Response as $key => $image){
+            if (intval($index->index) == intval($key)) {
+                $bool = true;
+                $path = substr($image, 1);
+                if ($filesystem->exists($path)) {
+                    $mime = finfo_file(finfo_open(FILEINFO_MIME_TYPE), $path);
+                    $response = new Response();
+                    $disposition = $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_INLINE, basename($path));
+                    $response->headers->set('Content-Disposition', $disposition);
+                    $response->headers->set('Content-Type', $mime);
+                    $response->setContent(file_get_contents($path));
+                    return $response;
+                }else{
+                    return $this->json_response('400', 'index exist but no image for : ' . $index->index . ' ');
+                }
             }
         }
-       
-        
-      
-        if ($zip!= null){
-        
-        }else{
-            return $this->json_response('500', 'wrong database configuration: slide type qcmp with empty response');
+        if ($bool == true) {
+            return $this->json_response('400', 'No image for index : '. $index->index.' ');
         }
+       
+        return $this->json_response('500', 'wrong database configuration: slide type qcmp with empty response');
     }
 }

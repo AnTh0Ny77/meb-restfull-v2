@@ -64,29 +64,45 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
                     ],
                 ]
             ],
+        ],
+         'getQCMP' => [
+            'pagination_enabeld' => false,
+            'method' => 'get',
+            'path' => '/slides/{id}/qcmp',
+            'read' => true,
+            'security' => 'is_granted("ROLE_USER")',
+            'controller' => GetQCMPController::class,
+            'openapi_context' => [
+                'security' => [['bearerAuth' => []]],
+                'summary' => 'retrieves the image for the slide qcm photo',
+                'requestBody' => [
+                    'content' => [
+                        'application/json' => [
+                            'schema'  => [
+                                'type'       => 'object',
+                                'properties' =>
+                                [
+                                    'index'  => ['type' => 'integer']
+                                ],
+                            ],
+                            'example' => [
+                                'index'        =>  1
+                            ],
+                        ],
+                    ],
+                ],
+                "responses" => [
+                    "200" => [
+                        "description" => "file",
+                        "content" => [
+                            "text/plain" => [
+                                "schema" =>  []
+                            ]
+                        ]
+                    ]
+                ]
+            ]
         ]
-        //  'getQCMP' => [
-        //     'pagination_enabeld' => false,
-        //     'method' => 'get',
-        //     'path' => '/slides/{id}/qcmp',
-        //     'read' => true,
-        //     'security' => 'is_granted("ROLE_USER")',
-        //     'controller' => GetQCMPController::class,
-        //     'openapi_context' => [
-        //         'security' => [['bearerAuth' => []]],
-        //         'summary' => 'retrieves the image for the slide qcm ',
-        //         "responses" => [
-        //             "200" => [
-        //                 "description" => "file",
-        //                 "content" => [
-        //                     "text/plain" => [
-        //                         "schema" =>  []
-        //                     ]
-        //                 ]
-        //             ]
-        //         ]
-        //     ]
-        // ]
         , 'play' => [
             'pagination_enabeld' => false,
             'path' => '/slides/{id}/play',
@@ -100,7 +116,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
                 'summary' => 'Play with the slide - Merci de lire la description',
                 'description' => 'Requete un peu différente puisque je vérifie que le game est bien disponible pour l utilisateur voir unlock/games, normalement le slide n est 
                 jouable qu une seule fois mais j ai desactivé le controle pour faciliter le developpement seul les slides de type QCM et question ouverte nécéssitent de passer la varialbe
-                answer dans le body , pour les autres slides l APi ne tiendra pas compte du contenu du body donc merci de passer un json vide, les slides de type QCMP ou Defis photos ne peuvent pas etre joués
+                answer dans le body , pour les autres slides l APi ne tiendra pas compte du contenu du body donc merci de passer un json vide, les Defis photos ne peuvent pas etre joués
                 par cette requete ', 
                 'read' => false,
                 'requestBody' => [
@@ -315,7 +331,6 @@ class Slide
                 $i ++;
                $temp[$i] = $image;
             }
-            shuffle($Response);
             return $temp;
         }
         return $this->Response;

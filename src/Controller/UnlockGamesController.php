@@ -11,6 +11,7 @@ use App\Repository\UserRepository;
 use App\Repository\QrCodeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\UnlockGamesRepository;
+use DateTime;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Routing\Annotation\Route;
@@ -67,6 +68,9 @@ class UnlockGamesController extends AbstractController
                         $newGame->setIdUser($user);
                         $newGame->setFinish(0);
                         $newGame->setQrCode($match);
+                        $date = new DateTime('now');
+                        $date->modify( '+1 day' );
+                        $newGame->setDate($date);
                         $this->em->persist($newGame);
                         $this->em->flush();
                         $game = $gr->findOneBy(array('id' => $match->getIdGame()));

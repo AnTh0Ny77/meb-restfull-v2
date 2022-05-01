@@ -108,6 +108,7 @@ class CreateQrController extends AbstractController
                     $response = new QrCodeResponse($result);
                     return  $response;
                     // $data = new JsonResponse($response, '201');
+                    // return $data;
                    
                   
             }

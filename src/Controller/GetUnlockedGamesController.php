@@ -53,7 +53,7 @@ class GetUnlockedGamesController extends AbstractController
                             "id" => $value['id_game_id'],
                             "name" => $value['name'], 
                             "destination" => $value['destination'],
-                            "time" => $value['time'] , 
+                            "date" => $value['date'] , 
                             "finish" => $value['finish']
                         ];
                         array_push($array_game,$game);

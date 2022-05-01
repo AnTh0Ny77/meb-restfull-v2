@@ -180,39 +180,39 @@ class Slide
     private $id;
 
     #[ORM\Column(type: 'string', length: 100)]
-    #[Groups(['read:Slide' , 'read:Slide:Offline'])]
+    #[Groups(['read:Slide' , 'read:Slide:Offline' , 'read:Game' ])]
     private $Name;
 
     #[ORM\Column(type: 'text', nullable: true)]
-    #[Groups(['read:Slide' , 'read:Slide:Offline'])]
+    #[Groups(['read:Slide' , 'read:Slide:Offline' , 'read:Game'])]
     private $Text;
 
     #[ORM\Column(type: 'text', nullable: true)]
-    #[Groups(['read:Slide', 'read:Slide:Offline'])]
+    #[Groups(['read:Slide', 'read:Slide:Offline', 'read:Game'])]
     private $TextSuccess;
 
     #[ORM\Column(type: 'text', nullable: true)]
-    #[Groups(['read:Slide', 'read:Slide:Offline'])]
+    #[Groups(['read:Slide', 'read:Slide:Offline' , 'read:Game'])]
     private $TextFail;
 
     #[ORM\Column(type: 'integer', nullable: true)]
-    #[Groups(['read:Slide', 'read:Slide:Offline'])]
+    #[Groups(['read:Slide', 'read:Slide:Offline' , 'read:Game'])]
     private $Time;
 
     #[ORM\Column(type: 'integer', nullable: true)]
-    #[Groups(['read:Slide' , 'read:Slide:Offline'])]
+    #[Groups(['read:Slide' , 'read:Slide:Offline' , 'read:Game'])]
     private $Step;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(['read:Slide', 'read:Slide:Offline'])]
+    #[Groups(['read:Slide', 'read:Slide:Offline' ])]
     private $Response;
 
     #[ORM\Column(type: 'boolean')]
-    #[Groups(['read:Slide', 'read:Slide:Offline'])]
+    #[Groups(['read:Slide', 'read:Slide:Offline' , 'read:Game'])]
     private $Penality;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(['read:Slide', 'read:Slide:Offline'])]
+    #[Groups(['read:Slide', 'read:Slide:Offline' , 'read:Game'])]
     private $CoverPath;
 
     #[ORM\ManyToOne(targetEntity: Poi::class, inversedBy: 'slides')]

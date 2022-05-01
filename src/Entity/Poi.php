@@ -71,15 +71,15 @@ class Poi
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['read:Quest', 'read:oneQuest' , 'read:Poi' ])]
+    #[Groups(['read:Quest', 'read:oneQuest' , 'read:Poi' , 'read:Game'])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 100)]
-    #[Groups(['read:Quest', 'read:oneQuest', 'read:Poi' , 'read:Clue'])]
+    #[Groups(['read:Quest', 'read:oneQuest', 'read:Poi' , 'read:Clue' , 'read:Game'])]
     private $Name;
 
     #[ORM\Column(type: 'json')]
-    #[Groups(['read:Quest', 'read:oneQuest', 'read:Poi'])]
+    #[Groups(['read:Quest', 'read:oneQuest', 'read:Poi' , 'read:Game'])]
     private $Latlng = [];
 
     #[ORM\ManyToOne(targetEntity: Quest::class, inversedBy: 'poi')]
@@ -87,25 +87,26 @@ class Poi
     private $Quest;
 
     #[ORM\Column(type: 'text', nullable: true)]
-    #[Groups(['read:Poi'])]
+    #[Groups(['read:Poi' , 'read:Game'])]
     private $Text;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(['read:Clue'])]
+    #[Groups(['read:Clue' , 'read:Game'])]
     private $clue;
 
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
     private $ImageClue;
 
     #[ORM\Column(type: 'smallint', nullable: true)]
-    #[Groups(['read:Quest', 'read:oneQuest', 'read:Poi'])]
+    #[Groups(['read:Quest', 'read:oneQuest', 'read:Poi' , 'read:Game'])]
     private $Step;
 
     #[ORM\ManyToOne(targetEntity: TypePoi::class, inversedBy: 'Poi')]
-    #[Groups(['read:Poi'])]
+    #[Groups(['read:Poi' , 'read:Game'])]
     private $typePoi;
 
     #[ORM\OneToMany(mappedBy: 'Poi', targetEntity: Slide::class)]
+    #[Groups([ 'read:Game'])]
     private $slides;
 
     public function __construct()

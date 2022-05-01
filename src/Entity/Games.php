@@ -58,10 +58,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
         'get' => [
             'pagination_enabeld' => false,
             'method' => 'get',
+            'security' => 'is_granted("ROLE_USER")',
             'openapi_context' => [
+                'security' =>
+                [['bearerAuth' => []]],
                 'summary' => 'public - retrieves a single game',
             ],
-            'normalization_context' => ['groups' => ['read:Games']]
+            'normalization_context' => ['groups' => ['read:Game']]
         ], "GetCover" => [
             'method' => 'Get',
             'path' => 'games/{id}/cover',
@@ -90,23 +93,23 @@ class Games
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups([ 'read:Games'])]
+    #[Groups([ 'read:Games' , 'read:Game'])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 100)]
-    #[Groups(['read:Games'])]
+    #[Groups(['read:Games' , 'read:Game'])]
     private $Name;
 
     #[ORM\Column(type: 'string', length: 10, nullable: true)]
-    #[Groups(['read:Games'])]
+    #[Groups(['read:Games' , 'read:Game'])]
     private $Destination;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(['read:Games'])]
+    #[Groups(['read:Games', 'read:Game'])]
     private $CoverPath;
 
     #[ORM\OneToMany(mappedBy: 'game', targetEntity: Quest::class, orphanRemoval: true)]
-    #[Groups(['read:Games'])]
+    #[Groups(['read:Games', 'read:Game'])]
     private $quests;
 
     #[ORM\ManyToMany(targetEntity: BagTools::class, mappedBy: 'Games')]

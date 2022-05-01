@@ -73,15 +73,15 @@ class Quest
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['read:Quest', 'read:oneQuest'])]
+    #[Groups(['read:Quest', 'read:oneQuest', 'read:Game'])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 100)]
-    #[Groups(['read:Quest' , 'read:oneQuest'])]
+    #[Groups(['read:Quest' , 'read:oneQuest' , 'read:Game'])]
     private $name;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
-    #[Groups(['read:Quest', 'read:oneQuest'])]
+    #[Groups(['read:Quest', 'read:oneQuest' , 'read:Game'])]
     private $color;
 
     #[ORM\ManyToOne(targetEntity: Games::class, inversedBy: 'quests')]
@@ -90,7 +90,7 @@ class Quest
     private $game;
 
     #[ORM\OneToMany(mappedBy: 'Quest', targetEntity: Poi::class)]
-    #[Groups([ 'read:oneQuest'])]
+    #[Groups([ 'read:oneQuest' , 'read:Game'])]
     private $poi;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]

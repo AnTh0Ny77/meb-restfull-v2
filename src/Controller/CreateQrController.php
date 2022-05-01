@@ -10,18 +10,27 @@ use App\Entity\UnlockGames;
 use App\Repository\UserRepository;
 use App\Repository\GamesRepository;
 use App\Repository\QuestRepository;
+use Endroid\QrCode\Builder\Builder;
 use App\Repository\QrCodeRepository;
+use Endroid\QrCode\Writer\PngWriter;
+use Endroid\QrCode\Encoding\Encoding;
+use Endroid\QrCode\Label\Font\NotoSans;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\UnlockGamesRepository;
+use Endroid\QrCode\Builder\BuilderInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Routing\Annotation\Route;
+use Endroid\QrCodeBundle\Response\QrCodeResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Endroid\QrCode\Label\Alignment\LabelAlignmentCenter;
+use Endroid\QrCode\RoundBlockSizeMode\RoundBlockSizeModeMargin;
+use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelHigh;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class CreateQrController extends AbstractController
 {
-
+    
     public function __construct(private Security $security, private EntityManagerInterface $em)
     {
     }
@@ -79,8 +88,27 @@ class CreateQrController extends AbstractController
                         "url" =>  $link,
                        
                     ];
-                    $data = new JsonResponse($response, '201');
-                    return  $data;
+                    $baseurl = $request->getScheme() . '://' . $request->getHttpHost() . $request->getBasePath();
+                    
+                    $link = $baseurl . '/'. $link;
+                    $result = Builder::create()
+                    ->writer(new PngWriter())
+                    ->writerOptions([])
+                    ->data($link)
+                    ->encoding(new Encoding('UTF-8'))
+                    ->errorCorrectionLevel(new ErrorCorrectionLevelHigh())
+                    ->size(300)
+                    ->margin(10)
+                    ->roundBlockSizeMode(new RoundBlockSizeModeMargin())
+                    ->labelText($game->getName())
+                    ->labelFont(new NotoSans(15))
+                    ->labelAlignment(new LabelAlignmentCenter())
+                    ->build();
+                    
+                    $response = new QrCodeResponse($result);
+                    return  $response;
+                    // $data = new JsonResponse($response, '201');
+                   
                   
             }
         }

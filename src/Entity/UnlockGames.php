@@ -77,6 +77,9 @@ class UnlockGames
     #[ORM\JoinColumn(nullable: false)]
     private $qrCode;
 
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private $date;
+
 
     public function __construct()
     {
@@ -128,6 +131,18 @@ class UnlockGames
     public function setQrCode(qrCode $qrCode): self
     {
         $this->qrCode = $qrCode;
+
+        return $this;
+    }
+
+    public function getDate(): ?\DateTimeInterface
+    {
+        return $this->date;
+    }
+
+    public function setDate(?\DateTimeInterface $date): self
+    {
+        $this->date = $date;
 
         return $this;
     }

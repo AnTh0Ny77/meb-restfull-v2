@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\GamesRepository;
+use App\Controller\FinishGameController;
 use App\Controller\GetCoverGamesController;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
@@ -63,6 +64,45 @@ use Symfony\Component\Serializer\Annotation\Groups;
                 'security' =>
                 [['bearerAuth' => []]],
                 'summary' => 'public - retrieves a single game',
+            ],
+            'normalization_context' => ['groups' => ['read:Game']]
+        ], 'SetFinish' => [
+            'pagination_enabeld' => false,
+            'method' => 'put',
+            'path' => 'games/{id}/finish',
+            'security' => 'is_granted("ROLE_USER")',
+            'controller' => FinishGameController::class,
+            'openapi_context' => [
+                'security' =>
+                [['bearerAuth' => []]],
+                'summary' => 'j’arrête l’aventure json vide en body svp ',
+                'requestBody' => [
+                    'content' => [
+                        'application/json' => [
+                            'schema'  => [
+                                'type'       => 'object',
+                            ],
+                        ],
+                    ],
+                ],
+                "responses" => [
+                    "200" => [
+                        "content" => [
+                            "application/json" => [
+                                "schema" =>  [
+                                    "properties" => [
+                                        "response" => [
+                                            "type" => "string"
+                                        ],
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    "401" => [
+                        "description" => "invalid request"
+                    ]
+                ]
             ],
             'normalization_context' => ['groups' => ['read:Game']]
         ], "GetCover" => [

@@ -59,6 +59,10 @@ class PlayController extends AbstractController
             if (empty($verify)) {
                 return $this->json_response('401', 'the game must be unlocked ');
             }
+           
+            if (intval($verify[0]['finish']) == 1) {
+                return $this->json_response('401', 'the game is already finished ');
+            }
             if ( $slide->getTypeSlide()->getId() == 6) {
                 return $this->json_response('400', 'please use the correct request for slide type: '. $slide->getTypeSlide()->getName().'');
             }

@@ -51,7 +51,7 @@ class UnlockGamesRepository extends ServiceEntityRepository
         $conn = $this->getEntityManager()->getConnection();
 
         $sql = '
-            SELECT * , q.id_game_id , q.time , g.name  FROM unlock_games u
+            SELECT u.id , u.id_user_id , u.finish, u.qr_code_id, u.date , q.id_game_id , q.time , g.name  FROM unlock_games u
             LEFT JOIN qr_code AS q ON ( q.id = u.qr_code_id )
             LEFT JOIN games AS g ON ( g.id = q.id_game_id )  
             WHERE u.id_user_id = :val

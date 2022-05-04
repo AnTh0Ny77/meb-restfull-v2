@@ -68,8 +68,7 @@ class UnlockGamesController extends AbstractController
                         $newGame->setIdUser($user);
                         $newGame->setFinish(0);
                         $newGame->setQrCode($match);
-                        $date = new DateTime('now');
-                        $date->modify( '+1 day' );
+                        $date = new DateTime('now +24 hours');
                         $newGame->setDate($date);
                         $this->em->persist($newGame);
                         $this->em->flush();

@@ -91,7 +91,7 @@ class CreateQrController extends AbstractController
                     $baseurl = $request->getScheme() . '://' . $request->getHttpHost() . $request->getBasePath();
                     
                     $link = $baseurl . ''. $link;
-                   
+                    dd($link);
                     $result = Builder::create()
                     ->writer(new PngWriter())
                     ->writerOptions([])

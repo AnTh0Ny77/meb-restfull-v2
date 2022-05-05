@@ -49,7 +49,9 @@ class GetUnlockedGamesController extends AbstractController
                 }else{
                     $array_game = [];
                     foreach ($list as $key => $value){
+                       
                         $game = [
+                            
                             "id" => $value['id_game_id'],
                             "name" => $value['name'], 
                             "destination" => $value['destination'],

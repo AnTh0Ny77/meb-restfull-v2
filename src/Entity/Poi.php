@@ -32,6 +32,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
             'method' => 'get',
             'normalization_context' => ['groups' => 'read:Poi'],
             'openapi_context' => [
+                'security' => [['bearerAuth' => []]],
                 'summary' => 'public - retrieves a single Poi ',
             ]
         ], 'getClue' => [
@@ -106,7 +107,7 @@ class Poi
     private $typePoi;
 
     #[ORM\OneToMany(mappedBy: 'Poi', targetEntity: Slide::class)]
-    #[Groups([ 'read:Game'])]
+    #[Groups([ 'read:Game' , 'read:Poi'])]
     private $slides;
 
     public function __construct()

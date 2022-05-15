@@ -78,7 +78,7 @@ class ConfirmGuestController extends AbstractController
                         "error" => $errorsString,
 
                     ];
-                    $data = new JsonResponse($response, '401');
+                    $data = new JsonResponse($response, '400');
                     return $data;
                 }else{
                     $pass = $hasher->hashPassword($user, $user->getPlainPassword());

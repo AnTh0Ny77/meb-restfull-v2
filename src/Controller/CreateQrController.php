@@ -94,7 +94,7 @@ class CreateQrController extends AbstractController
                     $result = Builder::create()
                     ->writer(new PngWriter())
                     ->writerOptions([])
-                    ->data($link)
+                    ->data($key)
                     ->encoding(new Encoding('UTF-8'))
                     ->errorCorrectionLevel(new ErrorCorrectionLevelHigh())
                     ->size(300)

@@ -15,14 +15,15 @@ class TypePoi
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(['read:Poi', 'read:Game'])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(['read:Poi'])]
+    #[Groups(['read:Poi' , 'read:Game'])]
     private $Name;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
-    #[Groups(['read:Poi'])]
+    #[Groups(['read:Poi', 'read:Game'])]
     private $Color;
 
     #[ORM\OneToMany(mappedBy: 'typePoi', targetEntity: Poi::class)]

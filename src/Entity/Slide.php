@@ -26,23 +26,25 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
                 'security' => [['bearerAuth' => []]],
                 'summary' => 'retrieves a Slide collection',
             ]
-        ], 'getOutLine' => [
-            'pagination_enabeld' => false,
-            'path' => 'slides/offline',
-            'method' => 'get',
-            'security' => 'is_granted("ROLE_USER")',
-            'normalization_context' => ['groups' => 'read:Slide:Offline'],
-            'openapi_context' => [
-                'security' => [['bearerAuth' => []]],
-                'summary' => 'retrieves a Slide collection with response for Outline parts',
-            ]
         ]
+        // 'getOutLine' => [
+        //     'pagination_enabeld' => false,
+        //     'path' => 'slides/offline',
+        //     'method' => 'get',
+        //     'security' => 'is_granted("ROLE_USER")',
+        //     'normalization_context' => ['groups' => 'read:Slide:Offline'],
+        //     'openapi_context' => [
+        //         'security' => [['bearerAuth' => []]],
+        //         'summary' => 'retrieves a Slide collection with response for Outline parts',
+        //     ]
+        // ]
     ],itemOperations:[
         'get' => [
             'pagination_enabeld' => false,
             'method' => 'get',
-            'normalization_context' => ['groups' => 'read:One:Slide'],
+            'normalization_context' => ['groups' => 'read:Slide'],
             'openapi_context' => [
+                'security' => [['bearerAuth' => []]],
                 'summary' => 'public - retrieves a single Slide ',
             ]
             ], "GetCover" => [
@@ -176,57 +178,57 @@ class Slide
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['read:Slide'])]
+    #[Groups(['read:Slide' , 'read:Game' , 'read:Poi'])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 100)]
-    #[Groups(['read:Slide' , 'read:Slide:Offline' , 'read:Game' ])]
+    #[Groups(['read:Slide' , 'read:Slide:Offline' , 'read:Game' , 'read:Poi' ])]
     private $Name;
 
     #[ORM\Column(type: 'text', nullable: true)]
-    #[Groups(['read:Slide' , 'read:Slide:Offline' , 'read:Game'])]
+    #[Groups(['read:Slide' , 'read:Slide:Offline' , 'read:Game' , 'read:Poi'])]
     private $Text;
 
     #[ORM\Column(type: 'text', nullable: true)]
-    #[Groups(['read:Slide', 'read:Slide:Offline', 'read:Game'])]
+    #[Groups(['read:Slide', 'read:Slide:Offline', 'read:Game' , 'read:Poi'])]
     private $TextSuccess;
 
     #[ORM\Column(type: 'text', nullable: true)]
-    #[Groups(['read:Slide', 'read:Slide:Offline' , 'read:Game'])]
+    #[Groups(['read:Slide', 'read:Slide:Offline' , 'read:Game' , 'read:Poi'])]
     private $TextFail;
 
     #[ORM\Column(type: 'integer', nullable: true)]
-    #[Groups(['read:Slide', 'read:Slide:Offline' , 'read:Game'])]
+    #[Groups(['read:Slide', 'read:Slide:Offline' , 'read:Game' , 'read:Poi'])]
     private $Time;
 
     #[ORM\Column(type: 'integer', nullable: true)]
-    #[Groups(['read:Slide' , 'read:Slide:Offline' , 'read:Game'])]
+    #[Groups(['read:Slide' , 'read:Slide:Offline' , 'read:Game' , 'read:Poi'])]
     private $Step;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(['read:Slide', 'read:Slide:Offline' ])]
+    #[Groups(['read:Slide', 'read:Slide:Offline' , 'read:Poi' ])]
     private $Response;
 
     #[ORM\Column(type: 'boolean')]
-    #[Groups(['read:Slide', 'read:Slide:Offline' , 'read:Game'])]
+    #[Groups(['read:Slide', 'read:Slide:Offline' , 'read:Game' , 'read:Poi'])]
     private $Penality;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(['read:Slide', 'read:Slide:Offline' , 'read:Game'])]
+    #[Groups(['read:Slide', 'read:Slide:Offline' , 'read:Game' , 'read:Poi'])]
     private $CoverPath;
 
     #[ORM\ManyToOne(targetEntity: Poi::class, inversedBy: 'slides')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['read:One:Slide' , 'read:Slide:Offline'])]
+    #[Groups(['read:One:Slide' , 'read:Slide:Offline' , 'read:Poi'])]
     private $Poi;
 
     #[ORM\ManyToOne(targetEntity: TypeSlide::class, inversedBy: 'Slide')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['read:Slide'])]
+    #[Groups(['read:Slide' , 'read:Game' , 'read:Poi'])]
     private $typeSlide;
 
     #[ORM\Column(type: 'string', length: 150, nullable: true)]
-    #[Groups([ 'read:Slide:Offline'])]
+    #[Groups([ 'read:Slide:Offline' , 'read:Slide' , 'read:Game' , 'read:Poi'])]
     private $Solution;
 
     public function getId(): ?int

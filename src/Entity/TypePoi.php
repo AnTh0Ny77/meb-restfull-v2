@@ -20,11 +20,11 @@ class TypePoi
 
     #[ORM\Column(type: 'string', length: 255)]
     #[Groups(['read:Poi' , 'read:Game'])]
-    private $Name;
+    private $name;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
     #[Groups(['read:Poi', 'read:Game'])]
-    private $Color;
+    private $color;
 
     #[ORM\OneToMany(mappedBy: 'typePoi', targetEntity: Poi::class)]
     private $Poi;
@@ -41,24 +41,24 @@ class TypePoi
 
     public function getName(): ?string
     {
-        return $this->Name;
+        return $this->name;
     }
 
-    public function setName(string $Name): self
+    public function setName(string $name): self
     {
-        $this->Name = $Name;
+        $this->name = $name;
 
         return $this;
     }
 
     public function getColor(): ?string
     {
-        return $this->Color;
+        return $this->color;
     }
 
-    public function setColor(?string $Color): self
+    public function setColor(?string $color): self
     {
-        $this->Color = $Color;
+        $this->color = $color;
 
         return $this;
     }

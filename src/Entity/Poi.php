@@ -15,7 +15,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 #[ORM\Entity(repositoryClass: PoiRepository::class)]
 #[ApiFilter(SearchFilter::class, properties: ['Quest' => 'exact'])]
 #[ApiResource(
-    order: ["Step" => "ASC"],
+    order: ["step" => "ASC"],
     collectionOperations: [
         'get' => [
             'pagination_enabeld' => false,
@@ -77,19 +77,19 @@ class Poi
 
     #[ORM\Column(type: 'string', length: 100)]
     #[Groups(['read:Quest', 'read:oneQuest', 'read:Poi' , 'read:Clue' , 'read:Game'])]
-    private $Name;
+    private $name;
 
     #[ORM\Column(type: 'json')]
     #[Groups(['read:Quest', 'read:oneQuest', 'read:Poi' , 'read:Game'])]
-    private $Latlng = [];
+    private $latlng = [];
 
     #[ORM\ManyToOne(targetEntity: Quest::class, inversedBy: 'poi')]
     #[Groups(['read:Poi'])]
-    private $Quest;
+    private $quest;
 
     #[ORM\Column(type: 'text', nullable: true)]
     #[Groups(['read:Poi' , 'read:Game'])]
-    private $Text;
+    private $text;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     #[Groups(['read:Clue' , 'read:Game'])]
@@ -100,7 +100,7 @@ class Poi
 
     #[ORM\Column(type: 'smallint', nullable: true)]
     #[Groups(['read:Quest', 'read:oneQuest', 'read:Poi' , 'read:Game'])]
-    private $Step;
+    private $step;
 
     #[ORM\ManyToOne(targetEntity: TypePoi::class, inversedBy: 'Poi')]
     #[Groups(['read:Poi' , 'read:Game'])]
@@ -123,48 +123,48 @@ class Poi
 
     public function getName(): ?string
     {
-        return $this->Name;
+        return $this->name;
     }
 
-    public function setName(string $Name): self
+    public function setName(string $name): self
     {
-        $this->Name = $Name;
+        $this->name = $name;
 
         return $this;
     }
 
     public function getLatlng(): ?array
     {
-        return $this->Latlng;
+        return $this->latlng;
     }
 
-    public function setLatlng(array $Latlng): self
+    public function setLatlng(array $latlng): self
     {
-        $this->Latlng = $Latlng;
+        $this->latlng = $latlng;
 
         return $this;
     }
 
     public function getQuest(): ?Quest
     {
-        return $this->Quest;
+        return $this->quest;
     }
 
-    public function setQuest(?Quest $Quest): self
+    public function setQuest(?Quest $quest): self
     {
-        $this->Quest = $Quest;
+        $this->quest = $quest;
 
         return $this;
     }
 
     public function getText(): ?string
     {
-        return $this->Text;
+        return $this->text;
     }
 
-    public function setText(?string $Text): self
+    public function setText(?string $text): self
     {
-        $this->Text = $Text;
+        $this->text = $text;
 
         return $this;
     }
@@ -195,12 +195,12 @@ class Poi
 
     public function getStep(): ?int
     {
-        return $this->Step;
+        return $this->step;
     }
 
-    public function setStep(?int $Step): self
+    public function setStep(?int $step): self
     {
-        $this->Step = $Step;
+        $this->step = $step;
 
         return $this;
     }

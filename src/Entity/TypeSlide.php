@@ -19,11 +19,11 @@ class TypeSlide
 
     #[ORM\Column(type: 'string', length: 100)]
     #[Groups(['read:Slide' , 'read:Game'])]
-    private $Name;
+    private $name;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
     #[Groups(['read:Slide' , 'read:Game'])]
-    private $Color;
+    private $color;
 
     #[ORM\OneToMany(mappedBy: 'typeSlide', targetEntity: Slide::class)]
     private $Slide;
@@ -40,24 +40,24 @@ class TypeSlide
 
     public function getName(): ?string
     {
-        return $this->Name;
+        return $this->name;
     }
 
-    public function setName(string $Name): self
+    public function setName(string $name): self
     {
-        $this->Name = $Name;
+        $this->name = $name;
 
         return $this;
     }
 
     public function getColor(): ?string
     {
-        return $this->Color;
+        return $this->color;
     }
 
-    public function setColor(?string $Color): self
+    public function setColor(?string $color): self
     {
-        $this->Color = $Color;
+        $this->color = $color;
 
         return $this;
     }

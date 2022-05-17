@@ -138,15 +138,15 @@ class Games
 
     #[ORM\Column(type: 'string', length: 100)]
     #[Groups(['read:Games' , 'read:Game'])]
-    private $Name;
+    private $name;
 
     #[ORM\Column(type: 'string', length: 10, nullable: true)]
     #[Groups(['read:Games' , 'read:Game'])]
-    private $Destination;
+    private $destination;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     #[Groups(['read:Games', 'read:Game'])]
-    private $CoverPath;
+    private $coverPath;
 
     #[ORM\OneToMany(mappedBy: 'game', targetEntity: Quest::class, orphanRemoval: true)]
     #[Groups(['read:Games', 'read:Game'])]
@@ -168,36 +168,36 @@ class Games
 
     public function getName(): ?string
     {
-        return $this->Name;
+        return $this->name;
     }
 
-    public function setName(string $Name): self
+    public function setName(string $name): self
     {
-        $this->Name = $Name;
+        $this->name = $name;
 
         return $this;
     }
 
     public function getDestination(): ?string
     {
-        return $this->Destination;
+        return $this->destination;
     }
 
-    public function setDestination(?string $Destination): self
+    public function setDestination(?string $destination): self
     {
-        $this->Destination = $Destination;
+        $this->destination = $destination;
 
         return $this;
     }
 
     public function getCoverPath(): ?string
     {
-        return $this->CoverPath;
+        return $this->coverPath;
     }
 
-    public function setCoverPath(?string $CoverPath): self
+    public function setCoverPath(?string $coverPath): self
     {
-        $this->CoverPath = $CoverPath;
+        $this->coverPath = $coverPath;
 
         return $this;
     }

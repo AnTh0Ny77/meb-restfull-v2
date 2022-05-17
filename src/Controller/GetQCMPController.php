@@ -44,13 +44,14 @@ class GetQCMPController extends AbstractController
        
         $filesystem = new Filesystem();
         $Response = $slide->getResponse();
-        $index = json_decode($request->getContent());
+        $index = $request->query->get('index');
+       
         if (empty($index)) {
             return $this->json_response('400', 'index cannot be empty ');
         }
         $bool = false;
         foreach ($Response as $key => $image){
-            if (intval($index->index) == intval($key)) {
+            if (intval($index) == intval($key)) {
                 $bool = true;
                 $path = substr($image, 1);
                 if ($filesystem->exists($path)) {
@@ -62,12 +63,12 @@ class GetQCMPController extends AbstractController
                     $response->setContent(file_get_contents($path));
                     return $response;
                 }else{
-                    return $this->json_response('400', 'index exist but no image for : ' . $index->index . ' ');
+                    return $this->json_response('400', 'index exist but no image for : ' . intval($index) . ' ');
                 }
             }
         }
-        if ($bool == true) {
-            return $this->json_response('400', 'No image for index : '. $index->index.' ');
+        if ($bool == false) {
+            return $this->json_response('400', 'No image for index : '. intval($index).' ');
         }
        
         return $this->json_response('500', 'wrong database configuration: slide type qcmp with empty response');

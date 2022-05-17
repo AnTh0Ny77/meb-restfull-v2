@@ -413,7 +413,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     #[Groups(['read:User'])]
-    private $CoverPath;
+    private $coverPath;
 
     /**
      * @var File|null
@@ -421,7 +421,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
      *     maxSize = "2048k",
      *     mimeTypes = {"image/jpeg", "image/png"},
      *     mimeTypesMessage = "Please upload a valid cover image: jpeg or png under 2048k")
-     * @Vich\UploadableField(mapping="user_cover", fileNameProperty="CoverPath")
+     * @Vich\UploadableField(mapping="user_cover", fileNameProperty="coverPath")
      */
     private $file;
 
@@ -606,12 +606,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
 
     public function getCoverPath(): ?string
     {
-        return $this->CoverPath;
+        return $this->coverPath;
     }
 
-    public function setCoverPath(?string $CoverPath): self
+    public function setCoverPath(?string $coverPath): self
     {
-        $this->CoverPath = $CoverPath;
+        $this->coverPath = $coverPath;
 
         return $this;
     }

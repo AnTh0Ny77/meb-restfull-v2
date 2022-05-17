@@ -15,7 +15,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 #[ORM\Entity(repositoryClass: SlideRepository::class)]
 #[ApiFilter(SearchFilter::class, properties: ['Poi' => 'exact'])]
 #[ApiResource(
-    order: ["Step" => "ASC"],
+    order: ["step" => "ASC"],
     collectionOperations: [
         'get' => [
             'pagination_enabeld' => false,
@@ -77,22 +77,19 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
             'openapi_context' => [
                 'security' => [['bearerAuth' => []]],
                 'summary' => 'retrieves the image for the slide qcm photo',
-                'requestBody' => [
-                    'content' => [
-                        'application/json' => [
-                            'schema'  => [
-                                'type'       => 'object',
-                                'properties' =>
-                                [
-                                    'index'  => ['type' => 'integer']
-                                ],
-                            ],
-                            'example' => [
-                                'index'        =>  1
-                            ],
-                        ],
-                    ],
-                ],
+                "parameters" => [
+                       [
+                          "name" => "index",
+                           "in" => "query",
+                          "description" => "index of response",
+                           "required" => true,
+                          "type" => "integer",
+                          "items" => [
+                               "type" => "integer"
+                           ]
+                       ]
+                   ],
+                
                 "responses" => [
                     "200" => [
                         "description" => "file",
@@ -183,39 +180,38 @@ class Slide
 
     #[ORM\Column(type: 'string', length: 100)]
     #[Groups(['read:Slide' , 'read:Slide:Offline' , 'read:Game' , 'read:Poi' ])]
-    private $Name;
+    private $name;
 
     #[ORM\Column(type: 'text', nullable: true)]
     #[Groups(['read:Slide' , 'read:Slide:Offline' , 'read:Game' , 'read:Poi'])]
-    private $Text;
+    private $text;
 
     #[ORM\Column(type: 'text', nullable: true)]
     #[Groups(['read:Slide', 'read:Slide:Offline', 'read:Game' , 'read:Poi'])]
-    private $TextSuccess;
+    private $textSuccess;
 
     #[ORM\Column(type: 'text', nullable: true)]
     #[Groups(['read:Slide', 'read:Slide:Offline' , 'read:Game' , 'read:Poi'])]
-    private $TextFail;
+    private $textFail;
 
     #[ORM\Column(type: 'integer', nullable: true)]
-    #[Groups(['read:Slide', 'read:Slide:Offline' , 'read:Game' , 'read:Poi'])]
-    private $Time;
+    private $time;
 
     #[ORM\Column(type: 'integer', nullable: true)]
     #[Groups(['read:Slide' , 'read:Slide:Offline' , 'read:Game' , 'read:Poi'])]
-    private $Step;
+    private $step;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(['read:Slide', 'read:Slide:Offline' , 'read:Poi' ])]
-    private $Response;
+    #[Groups(['read:Slide', 'read:Slide:Offline' ,  'read:Game' , 'read:Poi' ])]
+    private $response;
 
     #[ORM\Column(type: 'boolean')]
     #[Groups(['read:Slide', 'read:Slide:Offline' , 'read:Game' , 'read:Poi'])]
-    private $Penality;
+    private $penality;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     #[Groups(['read:Slide', 'read:Slide:Offline' , 'read:Game' , 'read:Poi'])]
-    private $CoverPath;
+    private $coverPath;
 
     #[ORM\ManyToOne(targetEntity: Poi::class, inversedBy: 'slides')]
     #[ORM\JoinColumn(nullable: false)]
@@ -229,7 +225,7 @@ class Slide
 
     #[ORM\Column(type: 'string', length: 150, nullable: true)]
     #[Groups([ 'read:Slide:Offline' , 'read:Slide' , 'read:Game' , 'read:Poi'])]
-    private $Solution;
+    private $solution;
 
     public function getId(): ?int
     {
@@ -238,12 +234,12 @@ class Slide
 
     public function getName(): ?string
     {
-        return $this->Name;
+        return $this->name;
     }
 
-    public function setName(string $Name): self
+    public function setName(string $name): self
     {
-        $this->Name = $Name;
+        $this->name = $name;
 
         return $this;
     }
@@ -253,63 +249,63 @@ class Slide
         $type = $this->getTypeSlide();
         $pattern = ";";
         if ($type->getId() == 3) {
-            $text =  explode(';',  $this->Text);
+            $text =  explode(';',  $this->text);
             return $text;
         }
-        return $this->Text;
+        return $this->text;
     }
 
-    public function setText(?string $Text): self
+    public function setText(?string $text): self
     {
-        $this->Text = $Text;
+        $this->text = $text;
 
         return $this;
     }
 
     public function getTextSuccess(): ?string
     {
-        return $this->TextSuccess;
+        return $this->textSuccess;
     }
 
-    public function setTextSuccess(?string $TextSuccess): self
+    public function setTextSuccess(?string $textSuccess): self
     {
-        $this->TextSuccess = $TextSuccess;
+        $this->textSuccess = $textSuccess;
 
         return $this;
     }
 
     public function getTextFail(): ?string
     {
-        return $this->TextFail;
+        return $this->textFail;
     }
 
-    public function setTextFail(?string $TextFail): self
+    public function setTextFail(?string $textFail): self
     {
-        $this->TextFail = $TextFail;
+        $this->textFail = $textFail;
 
         return $this;
     }
 
     public function getTime(): ?int
     {
-        return $this->Time;
+        return $this->time;
     }
 
-    public function setTime(?int $Time): self
+    public function setTime(?int $time): self
     {
-        $this->Time = $Time;
+        $this->Time = $time;
 
         return $this;
     }
 
     public function getStep(): ?int
     {
-        return $this->Step;
+        return $this->step;
     }
 
-    public function setStep(?int $Step): self
+    public function setStep(?int $step): self
     {
-        $this->Step = $Step;
+        $this->step = $step;
 
         return $this;
     }
@@ -319,14 +315,14 @@ class Slide
         $type = $this->getTypeSlide();
         $pattern = ";";
         if ($type->getId() == 2){
-            $Response =  explode(';',  $this->Response);
+            $Response =  explode(';',  $this->response);
             shuffle($Response);
             return $Response  ;
         }elseif ($type->getId() == 4) {
             return null;
         }
         elseif ($type->getId() == 5) {
-            $Response =  explode(';',  $this->Response);
+            $Response =  explode(';',  $this->response);
             $temp = [];
             $i = 0;
             foreach ($Response as $key => $image) {
@@ -335,36 +331,36 @@ class Slide
             }
             return $temp;
         }
-        return $this->Response;
+        return $this->response;
     }
 
-    public function setResponse(?string $Response): self
+    public function setResponse(?string $response): self
     {
-        $this->Response = $Response;
+        $this->response = $response;
 
         return $this;
     }
 
     public function getPenality(): ?bool
     {
-        return $this->Penality;
+        return $this->penality;
     }
 
-    public function setPenality(bool $Penality): self
+    public function setPenality(bool $penality): self
     {
-        $this->Penality = $Penality;
+        $this->penality = $penality;
 
         return $this;
     }
 
     public function getCoverPath(): ?string
     {
-        return $this->CoverPath;
+        return $this->coverPath;
     }
 
-    public function setCoverPath(?string $CoverPath): self
+    public function setCoverPath(?string $coverPath): self
     {
-        $this->CoverPath = $CoverPath;
+        $this->coverPath = $coverPath;
 
         return $this;
     }
@@ -395,12 +391,12 @@ class Slide
 
     public function getSolution(): ?string
     {
-        return $this->Solution;
+        return $this->solution;
     }
 
-    public function setSolution(?string $Solution): self
+    public function setSolution(?string $solution): self
     {
-        $this->Solution = $Solution;
+        $this->solution = $solution;
 
         return $this;
     }

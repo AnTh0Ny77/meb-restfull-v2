@@ -84,8 +84,8 @@ class Poi
     private $latlng = [];
 
     #[ORM\ManyToOne(targetEntity: Quest::class, inversedBy: 'poi')]
-    #[Groups(['read:Poi'])]
-    private $quest;
+    #[Groups(['read:Poi' , ])]
+    private $Quest;
 
     #[ORM\Column(type: 'text', nullable: true)]
     #[Groups(['read:Poi' , 'read:Game'])]
@@ -147,12 +147,12 @@ class Poi
 
     public function getQuest(): ?Quest
     {
-        return $this->quest;
+        return $this->Quest;
     }
 
-    public function setQuest(?Quest $quest): self
+    public function setQuest(?Quest $Quest): self
     {
-        $this->quest = $quest;
+        $this->Quest = $Quest;
 
         return $this;
     }

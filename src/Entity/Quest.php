@@ -89,7 +89,7 @@ class Quest
     #[Groups(['read:Quest', 'read:oneQuest'])]
     private $game;
 
-    #[ORM\OneToMany(mappedBy: 'Quest', targetEntity: Poi::class)]
+    #[ORM\OneToMany(mappedBy: 'quest', targetEntity: Poi::class)]
     #[Groups([ 'read:oneQuest' , 'read:Game'])]
     private $poi;
 

@@ -14,15 +14,15 @@ class TypeSlide
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['read:Slide' , 'read:Game'])]
+    #[Groups(['read:Slide' , 'read:Game' ,'read:Poi'])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 100)]
-    #[Groups(['read:Slide' , 'read:Game'])]
+    #[Groups(['read:Slide' , 'read:Game' ,'read:Poi'])]
     private $name;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
-    #[Groups(['read:Slide' , 'read:Game'])]
+    #[Groups(['read:Slide' , 'read:Game' ,'read:Poi'])]
     private $color;
 
     #[ORM\OneToMany(mappedBy: 'typeSlide', targetEntity: Slide::class)]

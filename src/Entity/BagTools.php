@@ -19,6 +19,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
         'get' => [
             'pagination_enabeld' => false,
             'method' => 'get',
+            'path' => '/bagTools',
             'security' => 'is_granted("ROLE_USER")',
             'normalization_context' => ['groups' => 'read:Tools' , 'read:Tools:Game' ],
             'openapi_context' => [
@@ -31,6 +32,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
         'get' => [
             'pagination_enabeld' => false,
             'method' => 'get',
+            'path' => '/bagTools/{id}',
             'security' => 'is_granted("ROLE_USER")',
             'normalization_context' => ['groups' => 'read:Tools'],
             'openapi_context' => [
@@ -40,7 +42,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
         ],'getCover' => [
             'pagination_enabeld' => false,
             'method' => 'get',
-            'path' => '/bag_tools/{id}/cover',
+            'path' => '/bagTools/{id}/cover',
             'read' => true,
             'security' => 'is_granted("ROLE_USER")',
             'normalization_context' => ['groups' => 'read:Tools'],

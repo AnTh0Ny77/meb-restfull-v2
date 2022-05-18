@@ -131,16 +131,23 @@ class PlayController extends AbstractController
                         return $this->json_response('500', 'wrong data base configutation for slide type (empty response list)');
                     }
                     $answer = json_decode($request->getContent());
-                    if (empty($answer)) {
+                    if (empty($answer->answer)) {
                         return $this->json_response('400', 'answer cannot be null or empty ');
                     }
-                    $solution_array = explode(';',  $slide->getSolution());
-                    $true = false;
-                    foreach ($solution_array as $key => $value) {
-                        if (strtoupper($value) == strtoupper($answer->answer)) {
-                            $true = true;
-                        }
+                    if (empty($answer->isAccepted)) {
+                        return $this->json_response('400', 'isAccepted cannot be null or empty ');
                     }
+                    // $solution_array = explode(';',  $slide->getSolution());
+                    $true = false;
+                    if ($answer->isAccepted == true) {
+                        $true = true;
+                    }
+                   
+                    // foreach ($solution_array as $key => $value) {
+                    //     if (strtoupper($value) == strtoupper($answer->answer)) {
+                    //         $true = true;
+                    //     }
+                    // }
                     if ($true) {
                         $score = new Score();
                         $score->setSlide($slide);

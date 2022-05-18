@@ -13,7 +13,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 #[ORM\Entity(repositoryClass: PoiRepository::class)]
-#[ApiFilter(SearchFilter::class, properties: ['Quest' => 'exact'])]
+#[ApiFilter(SearchFilter::class, properties: ['quest' => 'exact'])]
 #[ApiResource(
     order: ["step" => "ASC"],
     collectionOperations: [
@@ -37,7 +37,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
             ]
         ], 'getClue' => [
             'pagination_enabeld' => false,
-            'path' => '/Poi/{id}/Clue',
+            'path' => '/poi/{id}/clue',
             'method' => 'get',
             'normalization_context' => ['groups' => 'read:Clue'],
             'openapi_context' => [
@@ -46,7 +46,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
             ]
         ],'getImageClue' => [
             'pagination_enabeld' => false,
-            'path' => '/Poi/{id}/ImageClue',
+            'path' => '/Poi/{id}/imageClue',
             'controller' => GetImageClueController::class,
             'read' => true,
             'method' => 'get',
@@ -85,7 +85,7 @@ class Poi
 
     #[ORM\ManyToOne(targetEntity: Quest::class, inversedBy: 'poi')]
     #[Groups(['read:Poi' , ])]
-    private $Quest;
+    private $quest;
 
     #[ORM\Column(type: 'text', nullable: true)]
     #[Groups(['read:Poi' , 'read:Game'])]
@@ -106,7 +106,7 @@ class Poi
     #[Groups(['read:Poi' , 'read:Game'])]
     private $typePoi;
 
-    #[ORM\OneToMany(mappedBy: 'Poi', targetEntity: Slide::class)]
+    #[ORM\OneToMany(mappedBy: 'poi', targetEntity: Slide::class)]
     #[Groups([ 'read:Game' , 'read:Poi'])]
     private $slides;
 
@@ -147,12 +147,12 @@ class Poi
 
     public function getQuest(): ?Quest
     {
-        return $this->Quest;
+        return $this->quest;
     }
 
-    public function setQuest(?Quest $Quest): self
+    public function setQuest(?Quest $quest): self
     {
-        $this->Quest = $Quest;
+        $this->quest = $quest;
 
         return $this;
     }

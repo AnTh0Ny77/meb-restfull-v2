@@ -13,7 +13,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 #[ORM\Entity(repositoryClass: SlideRepository::class)]
-#[ApiFilter(SearchFilter::class, properties: ['Poi' => 'exact'])]
+#[ApiFilter(SearchFilter::class, properties: ['poi' => 'exact'])]
 #[ApiResource(
     order: ["step" => "ASC"],
     collectionOperations: [
@@ -116,7 +116,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
                 'description' => 'Requete un peu différente puisque je vérifie que le game est bien disponible pour l utilisateur voir unlock/games, normalement le slide n est 
                 jouable qu une seule fois mais j ai desactivé le controle pour faciliter le developpement seul les slides de type QCM et question ouverte nécéssitent de passer la varialbe
                 answer dans le body , pour les autres slides l APi ne tiendra pas compte du contenu du body donc merci de passer un json vide, les Defis photos ne peuvent pas etre joués
-                par cette requete ', 
+                par cette requete . La variable isAccepted  n est nécéssaire que pour les types :  Question', 
                 'read' => false,
                 'requestBody' => [
                     'content' => [
@@ -125,11 +125,13 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
                                 'type'       => 'object',
                                 'properties' =>
                                 [
-                                    'answer'  => ['type' => 'string']
+                                    'answer'  => ['type' => 'string'],
+                                    'isAccepted'  => ['type' => 'boolean']
                                 ],
                             ],
                             'example' => [
-                                'answer'        => 'Citron'
+                                'answer'        => 'Citron',
+                                'isAccepted'        => true
                             ],
                         ],
                     ],
@@ -216,7 +218,7 @@ class Slide
     #[ORM\ManyToOne(targetEntity: Poi::class, inversedBy: 'slides')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['read:One:Slide' , 'read:Slide:Offline' , 'read:Poi'])]
-    private $Poi;
+    private $poi;
 
     #[ORM\ManyToOne(targetEntity: TypeSlide::class, inversedBy: 'Slide')]
     #[ORM\JoinColumn(nullable: false)]
@@ -367,12 +369,12 @@ class Slide
 
     public function getPoi(): ?Poi
     {
-        return $this->Poi;
+        return $this->poi;
     }
 
-    public function setPoi(?Poi $Poi): self
+    public function setPoi(?Poi $poi): self
     {
-        $this->Poi = $Poi;
+        $this->poi = $poi;
 
         return $this;
     }

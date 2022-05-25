@@ -212,8 +212,10 @@ class Slide
     private $penality;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(['read:Slide', 'read:Slide:Offline' , 'read:Game' , 'read:Poi'])]
     private $coverPath;
+
+    #[Groups(['read:Slide', 'read:Slide:Offline', 'read:Game', 'read:Poi'])]
+    private $coverUrl;
 
     #[ORM\ManyToOne(targetEntity: Poi::class, inversedBy: 'slides')]
     #[ORM\JoinColumn(nullable: false)]
@@ -222,8 +224,10 @@ class Slide
 
     #[ORM\ManyToOne(targetEntity: TypeSlide::class, inversedBy: 'Slide')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['read:Slide' , 'read:Game' , 'read:Poi'])]
     private $typeSlide;
+
+    #[Groups(['read:Slide', 'read:Game', 'read:Poi'])]
+    private $typeSlideId;
 
     #[ORM\Column(type: 'string', length: 150, nullable: true)]
     #[Groups([ 'read:Slide:Offline' , 'read:Slide' , 'read:Game' , 'read:Poi'])]
@@ -329,7 +333,7 @@ class Slide
             $i = 0;
             foreach ($Response as $key => $image) {
                 $i ++;
-               $temp[$i] = $image;
+               $temp[$i] = 'api/slides/' .$this->getId() . '/qcmp?index=' . $i;
             }
             return $temp;
         }
@@ -360,6 +364,15 @@ class Slide
         return $this->coverPath;
     }
 
+    public function getCoverUrl()
+    {
+        if (!empty($this->getCoverPath())){
+            $this->coverUrl = 'api/slides/' . $this->getId() . '/cover';
+            return $this->coverUrl;
+        }
+        return null;
+    }
+
     public function setCoverPath(?string $coverPath): self
     {
         $this->coverPath = $coverPath;
@@ -384,6 +397,12 @@ class Slide
         return $this->typeSlide;
     }
 
+    public function getTypeSlideId()
+    {
+        $this->typeSlideId = $this->getTypeSlide()->getId();
+        return $this->typeSlideId;
+    }
+
     public function setTypeSlide(?TypeSlide $typeSlide): self
     {
         $this->typeSlide = $typeSlide;
@@ -402,4 +421,6 @@ class Slide
 
         return $this;
     }
+
+    
 }

@@ -80,8 +80,13 @@ class Poi
     private $name;
 
     #[ORM\Column(type: 'json')]
-    #[Groups(['read:Quest', 'read:oneQuest', 'read:Poi' , 'read:Game'])]
     private $latlng = [];
+
+    #[Groups(['read:Quest', 'read:oneQuest', 'read:Poi', 'read:Game'])]
+    private $lat;
+
+    #[Groups(['read:Quest', 'read:oneQuest', 'read:Poi', 'read:Game'])]
+    private $lng;
 
     #[ORM\ManyToOne(targetEntity: Quest::class, inversedBy: 'poi')]
     #[Groups(['read:Poi' , ])]
@@ -103,12 +108,16 @@ class Poi
     private $step;
 
     #[ORM\ManyToOne(targetEntity: TypePoi::class, inversedBy: 'Poi')]
-    #[Groups(['read:Poi' , 'read:Game'])]
     private $typePoi;
+
+    #[Groups(['read:Poi', 'read:Game'])]
+    private $typePoiId;
 
     #[ORM\OneToMany(mappedBy: 'poi', targetEntity: Slide::class)]
     #[Groups([ 'read:Game' , 'read:Poi'])]
     private $slides;
+
+  
 
     public function __construct()
     {
@@ -133,9 +142,26 @@ class Poi
         return $this;
     }
 
+    
     public function getLatlng(): ?array
     {
         return $this->latlng;
+    }
+
+    
+    public function getLat()
+    {
+        $array = $this->getLatlng();
+        $this->lat = $array['lat'];
+        return $this->lat;
+    }
+
+   
+    public function getLng()
+    {
+        $array = $this->getLatlng();
+        $this->lng = $array['lng'];
+        return $this->lng;
     }
 
     public function setLatlng(array $latlng): self
@@ -210,6 +236,12 @@ class Poi
         return $this->typePoi;
     }
 
+    public function getTypePoiId()
+    {
+        $this->typePoiId = $this->getTypePoi()->getId();
+        return $this->typePoiId;
+    }
+
     public function setTypePoi(?TypePoi $typePoi): self
     {
         $this->typePoi = $typePoi;
@@ -247,5 +279,5 @@ class Poi
         return $this;
     }
 
-  
+   
 }

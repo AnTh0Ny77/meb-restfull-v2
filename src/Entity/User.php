@@ -428,11 +428,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
     #[ORM\OneToMany(mappedBy: 'User', targetEntity: Score::class)]
     private $scores;
 
+    #[ORM\OneToMany(mappedBy: 'userId', targetEntity: QuestScore::class)]
+    private $questScores;
+
     public function __construct()
     {
         $this->createdAt = new \DateTime("now");
         $this->secret = new ArrayCollection();
         $this->scores = new ArrayCollection();
+        $this->questScores = new ArrayCollection();
     }
 
 
@@ -665,6 +669,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
             // set the owning side to null (unless already changed)
             if ($score->getUser() === $this) {
                 $score->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, QuestScore>
+     */
+    public function getQuestScores(): Collection
+    {
+        return $this->questScores;
+    }
+
+    public function addQuestScore(QuestScore $questScore): self
+    {
+        if (!$this->questScores->contains($questScore)) {
+            $this->questScores[] = $questScore;
+            $questScore->setUserId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeQuestScore(QuestScore $questScore): self
+    {
+        if ($this->questScores->removeElement($questScore)) {
+            // set the owning side to null (unless already changed)
+            if ($questScore->getUserId() === $this) {
+                $questScore->setUserId(null);
             }
         }
 

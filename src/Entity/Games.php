@@ -145,8 +145,10 @@ class Games
     private $destination;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(['read:Games', 'read:Game'])]
     private $coverPath;
+
+    #[Groups(['read:Games', 'read:Game'])]
+    private $coverUrl;
 
     #[ORM\OneToMany(mappedBy: 'game', targetEntity: Quest::class, orphanRemoval: true)]
     #[Groups(['read:Games', 'read:Game'])]
@@ -193,6 +195,15 @@ class Games
     public function getCoverPath(): ?string
     {
         return $this->coverPath;
+    }
+
+    public function getCoverUrl()
+    {
+        if (!empty($this->getCoverPath())) {
+            $this->coverUrl = 'api/games/' . $this->getId() . '/cover';
+            return $this->coverUrl;
+        }
+        return null;
     }
 
     public function setCoverPath(?string $coverPath): self
@@ -258,4 +269,6 @@ class Games
 
         return $this;
     }
+
+    
 }

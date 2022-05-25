@@ -10,20 +10,46 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TypePoiRepository::class)]
+#[ApiResource(
+    collectionOperations: [
+        'get' => [
+            'pagination_enabeld' => false,
+            'method' => 'get',
+            'normalization_context' => ['groups' => 'read:TypePoi'],
+            'security' => 'is_granted("ROLE_USER")',
+            'openapi_context' => [
+                'summary' => 'public - retrieves a TypePoi collection  ',
+                'security' => [['bearerAuth' => []]]
+            ]
+        ]
+    ],
+    itemOperations: [
+        'get' => [
+            'pagination_enabeld' => false,
+            'method' => 'get',
+            'normalization_context' => ['groups' => 'read:TypePoi'],
+            'security' => 'is_granted("ROLE_USER")',
+            'openapi_context' => [
+                'summary' => 'public - retrieves a single TypePoi   ',
+                'security' => [['bearerAuth' => []]]
+            ]
+        ]
+    ]
+)]
 class TypePoi
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['read:Poi', 'read:Game'])]
+    #[Groups(['read:Poi', 'read:Game' , 'read:TypePoi'])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(['read:Poi' , 'read:Game'])]
+    #[Groups(['read:Poi' , 'read:Game' , 'read:TypePoi'])]
     private $name;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
-    #[Groups(['read:Poi', 'read:Game'])]
+    #[Groups(['read:Poi', 'read:Game' , 'read:TypePoi'])]
     private $color;
 
     #[ORM\OneToMany(mappedBy: 'typePoi', targetEntity: Poi::class)]

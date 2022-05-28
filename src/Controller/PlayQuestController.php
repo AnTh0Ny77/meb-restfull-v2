@@ -56,7 +56,7 @@ class PlayQuestController extends AbstractController
 
         $verify_quest = $qr->findOneBY(['questId' => $quest->getID(), 'userId' => $user->getId()]);
 
-        if ($verify_quest instanceof QuestScore)
+        if ($verify_quest instanceof QuestScore and $verify_quest->getFinished() == 1 )
             return $this->json_response('401', 'You have already finished '.$quest->getName().'');
         
         $game = $quest->getGame();
@@ -93,10 +93,14 @@ class PlayQuestController extends AbstractController
                 }
                $quest_score += $poi_score;
             }
-            $questscore = new QuestScore();
+            if (!$verify_quest instanceof QuestScore) {
+                $questscore = new QuestScore();
+            } else $questscore = $verify_quest;
+           
             $questscore->setUserId($user);
             $questscore->setQuestId($quest);
             $questscore->setScore($quest_score);
+            $questscore->setFinished(1);
             $this->em->persist($questscore);
             $this->em->flush();
             $response = [

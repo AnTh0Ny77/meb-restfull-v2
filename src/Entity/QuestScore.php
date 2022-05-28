@@ -25,6 +25,9 @@ class QuestScore
     #[ORM\Column(type: 'integer')]
     private $score;
 
+    #[ORM\Column(type: 'boolean')]
+    private $finished;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -62,6 +65,18 @@ class QuestScore
     public function setScore(int $score): self
     {
         $this->score = $score;
+
+        return $this;
+    }
+
+    public function getFinished(): ?bool
+    {
+        return $this->finished;
+    }
+
+    public function setFinished(bool $finished): self
+    {
+        $this->finished = $finished;
 
         return $this;
     }

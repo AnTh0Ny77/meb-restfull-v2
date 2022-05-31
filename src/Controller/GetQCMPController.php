@@ -43,7 +43,7 @@ class GetQCMPController extends AbstractController
         }
        
         $filesystem = new Filesystem();
-        $Response = $slide->getResponse();
+        $Response = $slide->getUrlQcmp();
         $index = $request->query->get('index');
        
         if (empty($index)) {
@@ -51,9 +51,12 @@ class GetQCMPController extends AbstractController
         }
         $bool = false;
         foreach ($Response as $key => $image){
+            
             if (intval($index) == intval($key)) {
+                
                 $bool = true;
                 $path = substr($image, 1);
+            
                 if ($filesystem->exists($path)) {
                     $mime = finfo_file(finfo_open(FILEINFO_MIME_TYPE), $path);
                     $response = new Response();

@@ -339,6 +339,17 @@ class Slide
         }
         return $this->response;
     }
+    
+    public function getUrlQcmp(){
+        $Response =  explode(';',  $this->response);
+        $temp = [];
+        $i = 0;
+        foreach ($Response as $key => $image) {
+            $i++;
+            $temp[$i] = $image;
+        }
+        return $temp;
+    }
 
     public function setResponse(?string $response): self
     {

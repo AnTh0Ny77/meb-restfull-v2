@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\Poi;
 use App\Entity\User;
 use App\Entity\Games;
+use App\Entity\PoiScore;
 use App\Entity\Quest;
 use App\Entity\Score;
 use App\Entity\Slide;
@@ -12,6 +14,7 @@ use App\Entity\QuestScore;
 use App\Entity\UnlockGames;
 use App\Repository\UserRepository;
 use App\Repository\GamesRepository;
+use App\Repository\PoiScoreRepository;
 use App\Repository\QuestRepository;
 use App\Repository\ScoreRepository;
 use App\Repository\QrCodeRepository;
@@ -74,7 +77,49 @@ class PlayController extends AbstractController
         $this->em->flush();
     }
 
-    public function __invoke(Request $request, ScoreRepository $sr , GamesRepository $gr,QuestScoreRepository $qsr ,  QuestRepository $questRep, UserRepository $ur, UnlockGamesRepository $urRep, UploaderHelper $helper)
+    public function set_poi_score(Poi $poi , User $user , PoiScoreRepository $pr , ScoreRepository $sr){
+            $poi_score = 0 ;
+            $finished = 0 ;
+            $score_count = 0 ;
+            $slide_array = $poi->getSlides();
+            foreach ($slide_array as $slide) {
+                $score = $sr->findby(['Slide' => $slide->getID(), 'User' => $user->getId()]);
+                $score_count += 1 ;
+               
+                if (!empty($score)){
+                    foreach ($score as $key => $value) {
+                        $poi_score += $value->getPoint();
+                    }
+                }
+            }
+            if (count($slide_array) >= $score_count) {
+                $finished = 1;
+            }
+
+            $PoiScore = $pr->findOneBy(['Poi' => $poi->getID(), 'User' => $user->getId()]);
+            if (!$PoiScore instanceof PoiScore) {
+                $PoiScore = new PoiScore();
+                $PoiScore->setUser($user);
+                $PoiScore->setScore($poi_score);
+                $PoiScore->setPoi($poi);
+                $PoiScore->setFinished($finished);
+            }else{
+                $PoiScore->setUser($user);
+                $PoiScore->setScore($poi_score);
+                $PoiScore->setPoi($poi);
+                $PoiScore->setFinished($finished);
+            }
+            $this->em->persist($PoiScore);
+            $this->em->flush();
+    }
+
+    public function slide_already_play(Slide $slide , User $user , ScoreRepository $sr ){
+        $score_already = $sr->findOneby(['Slide' => $slide->getID(), 'User' => $user->getId()]);
+        
+        return $score_already ;
+    }
+
+    public function __invoke(Request $request, ScoreRepository $sr , GamesRepository $gr,QuestScoreRepository $qsr , PoiScoreRepository $pr ,  QuestRepository $questRep, UserRepository $ur, UnlockGamesRepository $urRep, UploaderHelper $helper)
     {
         $user = $this->security->getUser();
         if (empty($user)) {
@@ -89,6 +134,11 @@ class PlayController extends AbstractController
             $slide =  $request->get('data');
             if (!$slide instanceof Slide) {
                 return $this->json_response('401', 'Slide not found');
+            }
+            $score_already = $this->slide_already_play($slide , $user , $sr );
+
+            if ($score_already instanceof Score) {
+                return $this->json_response('403', 'Slide ' . $slide->getName() . ' was already play by user ' . $user->getUsername() . ' ');
             }
             $game = $slide->getPoi()->getQuest()->getGame();
 
@@ -116,6 +166,7 @@ class PlayController extends AbstractController
                     $score->setValue('');
                     $this->em->persist($score);
                     $this->em->flush();
+                    $this->set_poi_score($slide->getPoi() , $user , $pr , $sr );
                     $this->set_quest_score($slide->getPoi()->getQuest(), $user, $qsr, $sr);
                     $message = $slide->getTextSuccess();
                     $response = [
@@ -159,6 +210,7 @@ class PlayController extends AbstractController
                    }
                     $this->em->persist($score);
                     $this->em->flush();
+                    $this->set_poi_score($slide->getPoi(), $user, $pr, $sr);
                     $this->set_quest_score($slide->getPoi()->getQuest(), $user, $qsr, $sr);
                     $response = [
                         "message" => $message,
@@ -173,9 +225,10 @@ class PlayController extends AbstractController
                         return $this->json_response('500', 'wrong data base configutation for slide type (empty response list)');
                     }
                     $answer = json_decode($request->getContent());
-                    if (empty($answer->answer)) {
-                        return $this->json_response('400', 'answer cannot be null or empty ');
-                    }
+                   
+                    // if (empty($answer->answer)) {
+                    //     return $this->json_response('400', 'answer cannot be null or empty ');
+                    // }
                     if (empty($answer->isAccepted)) {
                         return $this->json_response('400', 'isAccepted cannot be null or empty ');
                     }
@@ -196,7 +249,7 @@ class PlayController extends AbstractController
                         $score->setUser($user);
                         $message = $slide->getTextSuccess();
                         $score->setPoint(1);
-                        $score->setValue($answer->answer);
+                        $score->setValue('auto value');
                     } else {
                         $score = new Score();
                         $score->setSlide($slide);
@@ -208,10 +261,11 @@ class PlayController extends AbstractController
                             $score->setPoint(0);
                         }
 
-                        $score->setValue($answer->answer);
+                        $score->setValue('auto value');
                     }
                     $this->em->persist($score);
                     $this->em->flush();
+                    $this->set_poi_score($slide->getPoi(), $user, $pr, $sr);
                     $this->set_quest_score($slide->getPoi()->getQuest(), $user, $qsr, $sr);
                     $response = [
                         "message" => $message,
@@ -255,6 +309,7 @@ class PlayController extends AbstractController
                     }
                     $this->em->persist($score);
                     $this->em->flush();
+                    $this->set_poi_score($slide->getPoi(), $user, $pr, $sr);
                     $this->set_quest_score($slide->getPoi()->getQuest(), $user, $qsr, $sr);
                     $response = [
                         "message" => $message,

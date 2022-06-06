@@ -3,24 +3,29 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Entity\Games;
 use App\Entity\QrCode;
+use DateTimeImmutable;
 use App\Entity\UnlockGames;
 use App\Repository\UserRepository;
 use App\Repository\GamesRepository;
 use App\Repository\QuestRepository;
+use Symfony\Component\Mime\Address;
 use App\Repository\QrCodeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\UnlockGamesRepository;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
 
 class MeController extends AbstractController
 {
 
-    public function __construct(private Security $security)
+    public function __construct(private Security $security ,private EntityManagerInterface $em)
     {
     }
     public function json_response(string $code, string $message)
@@ -32,8 +37,8 @@ class MeController extends AbstractController
         return $data;
     }
 
-    public function __invoke(Request $request, GamesRepository $gr, QuestRepository $questRep, UserRepository $ur, UnlockGamesRepository $urRep , UploaderHelper $helper)
-    {
+    public function __invoke(Request $request, GamesRepository $gr, TokenGeneratorInterface $tk , MailerInterface $mailer , QuestRepository $questRep, UserRepository $ur, UnlockGamesRepository $urRep , UploaderHelper $helper)
+    { 
         $user = $this->security->getUser();
         if (empty($user)) {
             return $this->json_response('401', 'JWT Token  not found');
@@ -47,7 +52,6 @@ class MeController extends AbstractController
             if ($user->getConfirmed() != true) {
                 return $this->json_response('400', 'user need to be confirmed , see: api/user/guest/confirm');
             } else {
-                
                 return $user;
             }
         }

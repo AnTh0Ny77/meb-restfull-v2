@@ -12,6 +12,7 @@ use App\Controller\PostGuestController;
 use App\Controller\ConfirmGuestController;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use App\Controller\ResetPasswordController;
 use App\Controller\UpdatePasswordController;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\HttpFoundation\File\File;
@@ -37,7 +38,63 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
                 'openapi_context' => [
                     'security' => [['bearerAuth' => []]]
                 ]
-            ], 
+            ],
+            'ResetPassword' => [
+                'pagination_enabeld' => false,
+                'path' => 'user/reset/password',
+                'method' => 'post',
+                'controller' => ResetPasswordController::class,
+                'normalization_context' => ['groups' => 'read:User'],
+                'read' => false,
+            'openapi_context' => [
+                'summary'     => 'Send a recovery link to the user',
+                'description' => '',
+                'requestBody' => [
+                    'content' => [
+                        'application/json' => [
+                            'schema'  => [
+                                'type'       => 'object',
+                                'properties' =>[
+                                    'email'  => ['type' => 'string']
+                                ],
+                            ],
+                            'example' => [
+                                'email'        => 'johndoe@yahoo.fr'
+                            ]
+                        ],
+                    ],
+                ],
+                "responses" => [
+                    "200" => [
+                        "description" => "user has been updated",
+                        "content" => [
+                            "application/json" => [
+                                "schema" =>  [
+                                    "properties" => [
+                                        "message" => [
+                                            "type" => "string"
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ], "201" => [
+                        "description" => "user has been updated",
+                        "content" => [
+                            "application/json" => [
+                                "schema" =>  [
+                                    "properties" => [
+                                        "message" => [
+                                            "type" => "string"
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+            ],
             'postGuest' => [
                 'pagination_enabeld' => false,
                 'path' => 'user/guest',
@@ -437,6 +494,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
         $this->secret = new ArrayCollection();
         $this->scores = new ArrayCollection();
         $this->questScores = new ArrayCollection();
+        $this->poiScores = new ArrayCollection();
     }
 
 
@@ -464,6 +522,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
 
         return $this;
     }
+
+    
 
     /**
      * A visual identifier that represents this user.
@@ -699,6 +759,112 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
             // set the owning side to null (unless already changed)
             if ($questScore->getUserId() === $this) {
                 $questScore->setUserId(null);
+            }
+        }
+
+        return $this;
+    }
+
+    private $forgotPasswordToken;
+
+    private $forgotPasswordTokenRequestedAt;
+    
+    private $forgotPasswordTokenMustBeVerifiedBefore;
+
+    #[ORM\OneToMany(mappedBy: 'User', targetEntity: PoiScore::class)]
+    private $poiScores;
+
+   
+   
+
+    /**
+     * Get the value of forgotPasswordToken
+     */ 
+    public function getForgotPasswordToken()
+    {
+        return $this->forgotPasswordToken;
+    }
+
+    /**
+     * Set the value of forgotPasswordToken
+     *
+     * @return  self
+     */ 
+    public function setForgotPasswordToken($forgotPasswordToken)
+    {
+        $this->forgotPasswordToken = $forgotPasswordToken;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of forgotPasswordTokenRequestedAt
+     */ 
+    public function getForgotPasswordTokenRequestedAt()
+    {
+        return $this->forgotPasswordTokenRequestedAt;
+    }
+
+    /**
+     * Set the value of forgotPasswordTokenRequestedAt
+     *
+     * @return  self
+     */ 
+    public function setForgotPasswordTokenRequestedAt($forgotPasswordTokenRequestedAt)
+    {
+        $this->forgotPasswordTokenRequestedAt = $forgotPasswordTokenRequestedAt;
+
+        return $this;
+    }
+
+   
+
+   
+
+    /**
+     * Get the value of forgotPasswordTokenMustBeVerifiedBefore
+     */ 
+    public function getForgotPasswordTokenMustBeVerifiedBefore()
+    {
+        return $this->forgotPasswordTokenMustBeVerifiedBefore;
+    }
+
+    /**
+     * Set the value of forgotPasswordTokenMustBeVerifiedBefore
+     *
+     * @return  self
+     */ 
+    public function setForgotPasswordTokenMustBeVerifiedBefore($forgotPasswordTokenMustBeVerifiedBefore)
+    {
+        $this->forgotPasswordTokenMustBeVerifiedBefore = $forgotPasswordTokenMustBeVerifiedBefore;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, PoiScore>
+     */
+    public function getPoiScores(): Collection
+    {
+        return $this->poiScores;
+    }
+
+    public function addPoiScore(PoiScore $poiScore): self
+    {
+        if (!$this->poiScores->contains($poiScore)) {
+            $this->poiScores[] = $poiScore;
+            $poiScore->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removePoiScore(PoiScore $poiScore): self
+    {
+        if ($this->poiScores->removeElement($poiScore)) {
+            // set the owning side to null (unless already changed)
+            if ($poiScore->getUser() === $this) {
+                $poiScore->setUser(null);
             }
         }
 

@@ -117,6 +117,10 @@ class Poi
     #[Groups([ 'read:Game' , 'read:Poi'])]
     private $slides;
 
+    #[ORM\Column(type: 'smallint', nullable: true)]
+    #[Groups(['read:Quest', 'read:oneQuest', 'read:Poi', 'read:Game'])]
+    private $Radius;
+
   
 
     public function __construct()
@@ -275,6 +279,18 @@ class Poi
                 $slide->setPoi(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getRadius(): ?int
+    {
+        return $this->Radius;
+    }
+
+    public function setRadius(?int $Radius): self
+    {
+        $this->Radius = $Radius;
 
         return $this;
     }

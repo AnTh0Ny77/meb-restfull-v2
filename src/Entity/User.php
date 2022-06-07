@@ -349,7 +349,6 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
                 'method' => 'PUT',
                 'controller' => UpdatePasswordController::class,
                 'openapi_context' => [
-                    'security' => [['bearerAuth' => []]],
                     'summary' => 'Update the user password',
                     'requestBody' => [
                         'content' => [

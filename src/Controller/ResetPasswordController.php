@@ -54,7 +54,7 @@ class ResetPasswordController extends AbstractController
         $this->em->flush($user);
 
         $email = (new TemplatedEmail())
-            ->from('anthonybs.pro@gmail.com')
+            ->from('testeurexplorelab@gmail.com')
             ->to(new Address($user->getEmail()))
             ->subject('Votre récupération de mot de passe')
             ->htmlTemplate('emails/passwordRecovery.html.twig')

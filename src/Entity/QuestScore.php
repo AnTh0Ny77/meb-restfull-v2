@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\QuestScoreRepository;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: QuestScoreRepository::class)]
@@ -16,6 +17,7 @@ class QuestScore
 
     #[ORM\ManyToOne(targetEntity: Quest::class)]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['read:Quest:User'])]
     private $questId;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'questScores')]
@@ -23,9 +25,11 @@ class QuestScore
     private $userId;
 
     #[ORM\Column(type: 'integer')]
+    #[Groups(['read:Quest:User'])]
     private $score;
 
     #[ORM\Column(type: 'boolean')]
+    #[Groups(['read:Quest:User'])]
     private $finished;
 
     public function getId(): ?int

@@ -14,6 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
     collectionOperations: [
         'get' => [
             'pagination_enabeld' => false,
+            'path' => 'typeSlides/',
             'method' => 'get',
             'normalization_context' => ['groups' => 'read:TypeSlide'],
             'security' => 'is_granted("ROLE_USER")',
@@ -27,6 +28,7 @@ use Doctrine\ORM\Mapping as ORM;
         'get' => [
             'pagination_enabeld' => false,
             'method' => 'get',
+            'path' => 'typeSlides/{id}',
             'normalization_context' => ['groups' => 'read:TypeSlide'],
             'security' => 'is_granted("ROLE_USER")',
             'openapi_context' => [

@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\PoiScoreRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: PoiScoreRepository::class)]
 class PoiScore
@@ -15,6 +16,7 @@ class PoiScore
 
     #[ORM\ManyToOne(targetEntity: Poi::class)]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['read:Poi:User'])]
     private $Poi;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'poiScores')]
@@ -22,9 +24,11 @@ class PoiScore
     private $User;
 
     #[ORM\Column(type: 'integer')]
+    #[Groups(['read:Poi:User'])]
     private $score;
 
     #[ORM\Column(type: 'boolean')]
+    #[Groups(['read:Poi:User'])]
     private $finished;
 
     public function getId(): ?int

@@ -72,7 +72,7 @@ class Poi
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['read:Quest', 'read:oneQuest' , 'read:Poi' , 'read:Game'])]
+    #[Groups(['read:Quest', 'read:oneQuest' , 'read:Poi' , 'read:Game' ,'read:Poi:User'])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 100)]

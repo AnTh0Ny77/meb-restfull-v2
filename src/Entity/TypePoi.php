@@ -2,18 +2,20 @@
 
 namespace App\Entity;
 
-use App\Repository\TypePoiRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use ApiPlatform\Core\Annotation\ApiResource;
-use Doctrine\Common\Collections\Collection;
-use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\TypePoiRepository;
+use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Core\Annotation\ApiResource;
+use App\Controller\GetCoverTypePoiController;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: TypePoiRepository::class)]
 #[ApiResource(
     collectionOperations: [
         'get' => [
             'pagination_enabeld' => false,
+            'path' => 'typePois/',
             'method' => 'get',
             'normalization_context' => ['groups' => 'read:TypePoi'],
             'security' => 'is_granted("ROLE_USER")',
@@ -27,11 +29,32 @@ use Doctrine\ORM\Mapping as ORM;
         'get' => [
             'pagination_enabeld' => false,
             'method' => 'get',
+            'path' => 'typePois/{id}',
             'normalization_context' => ['groups' => 'read:TypePoi'],
             'security' => 'is_granted("ROLE_USER")',
             'openapi_context' => [
                 'summary' => 'public - retrieves a single TypePoi   ',
                 'security' => [['bearerAuth' => []]]
+            ]
+        ] ,'getCover' => [
+            'pagination_enabeld' => false,
+            'method' => 'get',
+            'path' => '/typePois/{id}/cover',
+            'read' => true,
+            'normalization_context' => ['groups' => 'read:TypePoi'],
+            'controller' => GetCoverTypePoiController::class,
+            'openapi_context' => [
+                'summary' => 'retrieves the cover of the type Poi ',
+                "responses" => [
+                    "200" => [
+                        "description" => "file",
+                        "content" => [
+                            "text/plain" => [
+                                "schema" =>  []
+                            ]
+                        ]
+                    ]
+                ]
             ]
         ]
     ]
@@ -54,6 +77,11 @@ class TypePoi
 
     #[ORM\OneToMany(mappedBy: 'typePoi', targetEntity: Poi::class)]
     private $Poi;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $coverPath;
+
+    private $coverUrl;
 
     public function __construct()
     {
@@ -115,6 +143,43 @@ class TypePoi
                 $poi->setTypePoi(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCoverPath(): ?string
+    {
+        return $this->coverPath;
+    }
+
+    public function setCoverPath(?string $coverPath): self
+    {
+        $this->coverPath = $coverPath;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of coverUrl
+     */ 
+   
+    public function getCoverUrl()
+    {
+        if (!empty($this->getCoverPath())) {
+            $this->coverUrl = 'api/typePois/' . $this->getId() . '/cover';
+            return $this->coverUrl;
+        }
+    }
+    
+
+    /**
+     * Set the value of coverUrl
+     *
+     * @return  self
+     */ 
+    public function setCoverUrl($coverUrl)
+    {
+        $this->coverUrl = $coverUrl;
 
         return $this;
     }

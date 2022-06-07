@@ -14,6 +14,7 @@ use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Controller\ResetPasswordController;
 use App\Controller\UpdatePasswordController;
+use App\Repository\RankRepository;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\HttpFoundation\File\File;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -24,6 +25,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Lexik\Bundle\JWTAuthenticationBundle\Security\User\JWTUserInterface;
+use phpDocumentor\Reflection\Types\Nullable;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 #[ApiResource(
@@ -38,7 +40,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
                 'openapi_context' => [
                     'security' => [['bearerAuth' => []]]
                 ]
-            ],
+            ], 
             'ResetPassword' => [
                 'pagination_enabeld' => false,
                 'path' => 'user/reset/password',
@@ -319,7 +321,27 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
                             ],
                         ]
                 ],
-            ],
+            ], 'poiScore' => [
+                'pagination_enabeld' => false,
+                'path' => 'user/{id}/poi/score',
+                'deserialize' => true,
+                'read' =>  true ,
+                'method' => 'get',
+                'normalization_context' => ['groups' => 'read:Poi:User'],
+                'openapi_context' => [
+                    'security' => [['bearerAuth' => []]]
+                ]
+            ], 'QuestScore' => [
+                'pagination_enabeld' => false,
+                'path' => 'user/{id}/quest/score',
+                'deserialize' => true,
+                'read' =>  true,
+                'method' => 'get',
+                'normalization_context' => ['groups' => 'read:Quest:User'],
+                'openapi_context' => [
+                    'security' => [['bearerAuth' => []]]
+                ]
+        ],
             'updatePassword' =>[
                 'pagination_enabeld' => false,
                 'deserialize' => false,
@@ -486,10 +508,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
     private $scores;
 
     #[ORM\OneToMany(mappedBy: 'userId', targetEntity: QuestScore::class)]
+    #[Groups(['read:Quest:User'])]
     private $questScores;
+
+    #[ORM\OneToMany(mappedBy: 'User', targetEntity: PoiScore::class)]
+    #[Groups(['read:Poi:User'])]
+    private $poiScores;
+
+    #[ORM\ManyToOne(targetEntity: Rank::class, inversedBy: 'User')]
+    #[Groups(['read:User'])]
+    private $rank;
+
 
     public function __construct()
     {
+        
         $this->createdAt = new \DateTime("now");
         $this->secret = new ArrayCollection();
         $this->scores = new ArrayCollection();
@@ -771,11 +804,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
     
     private $forgotPasswordTokenMustBeVerifiedBefore;
 
-    #[ORM\OneToMany(mappedBy: 'User', targetEntity: PoiScore::class)]
-    private $poiScores;
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $phone;
 
-   
-   
+    
 
     /**
      * Get the value of forgotPasswordToken
@@ -867,6 +899,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
                 $poiScore->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getRank(): ?Rank
+    {
+        return $this->rank;
+    }
+
+    public function setRank(?Rank $rank): self
+    {
+        $this->rank = $rank;
+
+        return $this;
+    }
+
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(?string $phone): self
+    {
+        $this->phone = $phone;
 
         return $this;
     }

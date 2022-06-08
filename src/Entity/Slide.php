@@ -177,44 +177,44 @@ class Slide
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['read:Slide' , 'read:Game' , 'read:Poi'])]
+    #[Groups(['read:Slide' , 'read:Game' , 'read:Poi' , 'read:Game:User'])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 100)]
-    #[Groups(['read:Slide' , 'read:Slide:Offline' , 'read:Game' , 'read:Poi' ])]
+    #[Groups(['read:Slide' , 'read:Slide:Offline' , 'read:Game' , 'read:Poi' , 'read:Game:User' ])]
     private $name;
 
     #[ORM\Column(type: 'text', nullable: true)]
-    #[Groups(['read:Slide' , 'read:Slide:Offline' , 'read:Game' , 'read:Poi'])]
+    #[Groups(['read:Slide' , 'read:Slide:Offline' , 'read:Game' , 'read:Poi' , 'read:Game:User'])]
     private $text;
 
     #[ORM\Column(type: 'text', nullable: true)]
-    #[Groups(['read:Slide', 'read:Slide:Offline', 'read:Game' , 'read:Poi'])]
+    #[Groups(['read:Slide', 'read:Slide:Offline', 'read:Game' , 'read:Poi' , 'read:Game:User'])]
     private $textSuccess;
 
     #[ORM\Column(type: 'text', nullable: true)]
-    #[Groups(['read:Slide', 'read:Slide:Offline' , 'read:Game' , 'read:Poi'])]
+    #[Groups(['read:Slide', 'read:Slide:Offline' , 'read:Game' , 'read:Poi' , 'read:Game:User'])]
     private $textFail;
 
     #[ORM\Column(type: 'integer', nullable: true)]
     private $time;
 
     #[ORM\Column(type: 'integer', nullable: true)]
-    #[Groups(['read:Slide' , 'read:Slide:Offline' , 'read:Game' , 'read:Poi'])]
+    #[Groups(['read:Slide' , 'read:Slide:Offline' , 'read:Game' , 'read:Poi' , 'read:Game:User'])]
     private $step;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(['read:Slide', 'read:Slide:Offline' ,  'read:Game' , 'read:Poi' ])]
+    #[Groups(['read:Slide', 'read:Slide:Offline' ,  'read:Game' , 'read:Poi' , 'read:Game:User'])]
     private $response;
 
     #[ORM\Column(type: 'boolean')]
-    #[Groups(['read:Slide', 'read:Slide:Offline' , 'read:Game' , 'read:Poi'])]
+    #[Groups(['read:Slide', 'read:Slide:Offline' , 'read:Game' , 'read:Poi' , 'read:Game:User'])]
     private $penality;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $coverPath;
 
-    #[Groups(['read:Slide', 'read:Slide:Offline', 'read:Game', 'read:Poi'])]
+    #[Groups(['read:Slide', 'read:Slide:Offline', 'read:Game', 'read:Poi' , 'read:Game:User'])]
     private $coverUrl;
 
     #[ORM\ManyToOne(targetEntity: Poi::class, inversedBy: 'slides')]
@@ -226,11 +226,11 @@ class Slide
     #[ORM\JoinColumn(nullable: false)]
     private $typeSlide;
 
-    #[Groups(['read:Slide', 'read:Game', 'read:Poi'])]
+    #[Groups(['read:Slide', 'read:Game', 'read:Poi' , 'read:Game:User'])]
     private $typeSlideId;
 
     #[ORM\Column(type: 'string', length: 150, nullable: true)]
-    #[Groups([ 'read:Slide:Offline' , 'read:Slide' , 'read:Game' , 'read:Poi'])]
+    #[Groups([ 'read:Slide:Offline' , 'read:Slide' , 'read:Game' , 'read:Poi',  'read:Game:User'])]
     private $solution;
 
     public function getId(): ?int

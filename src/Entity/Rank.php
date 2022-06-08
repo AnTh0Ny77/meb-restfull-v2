@@ -11,6 +11,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: RankRepository::class)]
+#[ORM\Table(name: 'ranks')]
 #[ApiResource(
     collectionOperations: [
         'get' => [

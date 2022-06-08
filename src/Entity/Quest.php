@@ -68,29 +68,35 @@ class Quest
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['read:Quest', 'read:oneQuest', 'read:Game'])]
+    #[Groups(['read:Quest', 'read:oneQuest', 'read:Game' , 'read:Game:User'])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 100)]
-    #[Groups(['read:Quest' , 'read:oneQuest' , 'read:Game'])]
+    #[Groups(['read:Quest' , 'read:oneQuest' , 'read:Game' , 'read:Game:User'])]
     private $name;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
-    #[Groups(['read:Quest', 'read:oneQuest' , 'read:Game'])]
+    #[Groups(['read:Quest', 'read:oneQuest' , 'read:Game' , 'read:Game:User'])]
     private $color;
 
     #[ORM\ManyToOne(targetEntity: Games::class, inversedBy: 'quests')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['read:Quest', 'read:oneQuest'])]
+    #[Groups(['read:Quest', 'read:oneQuest' , 'read:Game:User'])]
     private $game;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(['read:oneQuest', 'read:Game'])]
+    #[Groups(['read:oneQuest', 'read:Game' , 'read:Game:User'])]
     private $responseQuest;
 
     #[ORM\OneToMany(mappedBy: 'quest', targetEntity: Poi::class)]
-    #[Groups([ 'read:oneQuest' , 'read:Game'])]
+    #[Groups([ 'read:oneQuest' , 'read:Game' , 'read:Game:User'])]
     private $poi;
+
+    #[Groups(['read:Game:User'])]
+    private $userQuestScore;
+
+    #[Groups(['read:Game:User'])]
+    private $userQuestFinished;
 
     public function __construct()
     {
@@ -176,6 +182,46 @@ class Quest
     public function setResponseQuest(?string $responseQuest): self
     {
         $this->responseQuest = $responseQuest;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of userQuestScore
+     */ 
+    public function getUserQuestScore()
+    {
+        return $this->userQuestScore;
+    }
+
+    /**
+     * Set the value of userQuestScore
+     *
+     * @return  self
+     */ 
+    public function setUserQuestScore($userQuestScore)
+    {
+        $this->userQuestScore = $userQuestScore;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of userQuestFinished
+     */ 
+    public function getUserQuestFinished()
+    {
+        return $this->userQuestFinished;
+    }
+
+    /**
+     * Set the value of userQuestFinished
+     *
+     * @return  self
+     */ 
+    public function setUserQuestFinished($userQuestFinished)
+    {
+        $this->userQuestFinished = $userQuestFinished;
 
         return $this;
     }

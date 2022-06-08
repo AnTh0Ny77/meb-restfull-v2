@@ -85,41 +85,47 @@ class Poi
     #[Groups(['read:Quest', 'read:oneQuest', 'read:Poi', 'read:Game'])]
     private $lat;
 
-    #[Groups(['read:Quest', 'read:oneQuest', 'read:Poi', 'read:Game'])]
+    #[Groups(['read:Quest', 'read:oneQuest', 'read:Poi', 'read:Game' , 'read:Game:User'])]
     private $lng;
 
     #[ORM\ManyToOne(targetEntity: Quest::class, inversedBy: 'poi')]
-    #[Groups(['read:Poi' , ])]
+    #[Groups(['read:Poi' ])]
     private $quest;
 
     #[ORM\Column(type: 'text', nullable: true)]
-    #[Groups(['read:Poi' , 'read:Game'])]
+    #[Groups(['read:Poi' , 'read:Game' , 'read:Game:User'])]
     private $text;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(['read:Clue' , 'read:Game'])]
+    #[Groups(['read:Clue' , 'read:Game' , 'read:Game:User'])]
     private $clue;
 
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
     private $ImageClue;
 
     #[ORM\Column(type: 'smallint', nullable: true)]
-    #[Groups(['read:Quest', 'read:oneQuest', 'read:Poi' , 'read:Game'])]
+    #[Groups(['read:Quest', 'read:oneQuest', 'read:Poi' , 'read:Game' , 'read:Game:User'])]
     private $step;
 
     #[ORM\ManyToOne(targetEntity: TypePoi::class, inversedBy: 'Poi')]
     private $typePoi;
 
-    #[Groups(['read:Poi', 'read:Game'])]
+    #[Groups(['read:Poi', 'read:Game' , 'read:Game:User'])]
     private $typePoiId;
 
     #[ORM\OneToMany(mappedBy: 'poi', targetEntity: Slide::class)]
-    #[Groups([ 'read:Game' , 'read:Poi'])]
+    #[Groups([ 'read:Game' , 'read:Poi' , 'read:Game:User'])]
     private $slides;
 
     #[ORM\Column(type: 'smallint', nullable: true)]
-    #[Groups(['read:Quest', 'read:oneQuest', 'read:Poi', 'read:Game'])]
-    private $Radius;
+    #[Groups(['read:Quest', 'read:oneQuest', 'read:Poi', 'read:Game' , 'read:Game:User' ])]
+    private $radius;
+
+    #[Groups(['read:Game:User'])]
+    private $userPoiScore;
+
+    #[Groups(['read:Game:User'])]
+    private $userPoiFinsihed;
 
   
 
@@ -285,15 +291,55 @@ class Poi
 
     public function getRadius(): ?int
     {
-        return $this->Radius;
+        return $this->radius;
     }
 
     public function setRadius(?int $Radius): self
     {
-        $this->Radius = $Radius;
+        $this->radius = $Radius;
 
         return $this;
     }
 
    
+
+    /**
+     * Get the value of userPoiScore
+     */ 
+    public function getUserPoiScore()
+    {
+        return $this->userPoiScore;
+    }
+
+    /**
+     * Set the value of userPoiScore
+     *
+     * @return  self
+     */ 
+    public function setUserPoiScore($userPoiScore)
+    {
+        $this->userPoiScore = $userPoiScore;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of userPoiFinsihed
+     */ 
+    public function getUserPoiFinsihed()
+    {
+        return $this->userPoiFinsihed;
+    }
+
+    /**
+     * Set the value of userPoiFinsihed
+     *
+     * @return  self
+     */ 
+    public function setUserPoiFinsihed($userPoiFinsihed)
+    {
+        $this->userPoiFinsihed = $userPoiFinsihed;
+
+        return $this;
+    }
 }

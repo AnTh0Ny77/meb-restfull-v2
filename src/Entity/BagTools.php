@@ -74,15 +74,15 @@ class BagTools
 
     #[ORM\Column(type: 'string', length: 100)]
     #[Groups(['read:Tools', 'read:Tools:Game'])]
-    private $Name;
+    private $name;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
     #[Groups(['read:Tools', 'read:Tools:Game'])]
-    private $Color;
+    private $color;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     #[Groups(['read:Tools', 'read:Tools:Game'])]
-    private $CoverPath;
+    private $coverPath;
 
     #[ORM\ManyToMany(targetEntity: Games::class, inversedBy: 'bagTools')]
     #[Groups(['read:Tools', 'read:Tools:Game'])]
@@ -100,36 +100,36 @@ class BagTools
 
     public function getName(): ?string
     {
-        return $this->Name;
+        return $this->name;
     }
 
     public function setName(string $Name): self
     {
-        $this->Name = $Name;
+        $this->name = $Name;
 
         return $this;
     }
 
     public function getColor(): ?string
     {
-        return $this->Color;
+        return $this->color;
     }
 
     public function setColor(?string $Color): self
     {
-        $this->Color = $Color;
+        $this->color = $Color;
 
         return $this;
     }
 
     public function getCoverPath(): ?string
     {
-        return $this->CoverPath;
+        return $this->coverPath;
     }
 
     public function setCoverPath(?string $CoverPath): self
     {
-        $this->CoverPath = $CoverPath;
+        $this->coverPath = $CoverPath;
 
         return $this;
     }

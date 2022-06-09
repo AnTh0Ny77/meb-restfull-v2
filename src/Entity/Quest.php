@@ -81,7 +81,7 @@ class Quest
 
     #[ORM\ManyToOne(targetEntity: Games::class, inversedBy: 'quests')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['read:Quest', 'read:oneQuest' , 'read:Game:User'])]
+    #[Groups(['read:Quest', 'read:oneQuest' ])]
     private $game;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]

@@ -229,6 +229,9 @@ class Slide
     #[Groups(['read:Slide', 'read:Game', 'read:Poi' , 'read:Game:User'])]
     private $typeSlideId;
 
+    #[Groups(['read:Slide', 'read:Game', 'read:Poi', 'read:Game:User'])]
+    private $typeSlideName;
+
     #[ORM\Column(type: 'string', length: 150, nullable: true)]
     #[Groups([ 'read:Slide:Offline' , 'read:Slide' , 'read:Game' , 'read:Poi',  'read:Game:User'])]
     private $solution;
@@ -434,4 +437,25 @@ class Slide
     }
 
     
+
+    /**
+     * Get the value of typeSlideName
+     */ 
+    public function getTypeSlideName()
+    {
+        $this->typeSlideName = $this->getTypeSlide()->getName();
+        return $this->typeSlideName;
+    }
+
+    /**
+     * Set the value of typeSlideName
+     *
+     * @return  self
+     */ 
+    public function setTypeSlideName($typeSlideName)
+    {
+        $this->typeSlideName = $typeSlideName;
+
+        return $this;
+    }
 }

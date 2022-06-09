@@ -72,17 +72,17 @@ class Poi
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['read:Quest', 'read:oneQuest' , 'read:Poi' , 'read:Game' ,'read:Poi:User'])]
+    #[Groups(['read:Quest', 'read:oneQuest' , 'read:Poi' , 'read:Game' ,'read:Poi:User' , 'read:Game:User'])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 100)]
-    #[Groups(['read:Quest', 'read:oneQuest', 'read:Poi' , 'read:Clue' , 'read:Game'])]
+    #[Groups(['read:Quest', 'read:oneQuest', 'read:Poi' , 'read:Clue' , 'read:Game' , 'read:Game:User'])]
     private $name;
 
     #[ORM\Column(type: 'json')]
     private $latlng = [];
 
-    #[Groups(['read:Quest', 'read:oneQuest', 'read:Poi', 'read:Game'])]
+    #[Groups(['read:Quest', 'read:oneQuest', 'read:Poi', 'read:Game' , 'read:Game:User'])]
     private $lat;
 
     #[Groups(['read:Quest', 'read:oneQuest', 'read:Poi', 'read:Game' , 'read:Game:User'])]
@@ -112,6 +112,15 @@ class Poi
 
     #[Groups(['read:Poi', 'read:Game' , 'read:Game:User'])]
     private $typePoiId;
+
+    #[Groups(['read:Game:User'])]
+    private $typePoiName;
+
+    #[Groups(['read:Game:User'])]
+    private $typePoiColor;
+
+    #[Groups(['read:Game:User'])]
+    private $typePoiCoverUrl;
 
     #[ORM\OneToMany(mappedBy: 'poi', targetEntity: Slide::class)]
     #[Groups([ 'read:Game' , 'read:Poi' , 'read:Game:User'])]
@@ -342,4 +351,56 @@ class Poi
 
         return $this;
     }
+
+    /**
+     * Get the value of typePoiName
+     */ 
+    public function getTypePoiName()
+    {
+        $this->typePoiName = $this->getTypePoi()->getName();
+        return $this->typePoiName;
+    }
+
+    /**
+     * Get the value of typePoiColor
+     */ 
+    public function getTypePoiColor()
+    {
+        $this->typePoiColor = $this->getTypePoi()->getColor();
+        return $this->typePoiColor;
+    }
+
+    /**
+     * Set the value of typePoiName
+     *
+     * @return  self
+     */ 
+    public function setTypePoiName($typePoiName)
+    {
+        $this->typePoiName = $typePoiName;
+
+        return $this;
+    }
+
+    /**
+     * Set the value of typePoiCoverUrl
+     *
+     * @return  self
+     */ 
+    public function setTypePoiCoverUrl($typePoiCoverUrl)
+    {
+        $this->typePoiCoverUrl = $typePoiCoverUrl;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of typePoiCoverUrl
+     */ 
+    public function getTypePoiCoverUrl()
+    {
+        $this->typePoiCoverUrl = $this->getTypePoi()->getCoverUrl();
+        return $this->typePoiCoverUrl;
+    }
+
 }

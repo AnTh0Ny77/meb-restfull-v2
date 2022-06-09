@@ -68,11 +68,11 @@ class TypePoi
     private $id;
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(['read:Poi' , 'read:Game' , 'read:TypePoi'])]
+    #[Groups(['read:Poi' , 'read:Game' , 'read:TypePoi' ])]
     private $name;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
-    #[Groups(['read:Poi', 'read:Game' , 'read:TypePoi'])]
+    #[Groups(['read:Poi', 'read:Game' , 'read:TypePoi' ])]
     private $color;
 
     #[ORM\OneToMany(mappedBy: 'typePoi', targetEntity: Poi::class)]

@@ -134,7 +134,7 @@ class Poi
     private $userPoiScore;
 
     #[Groups(['read:Game:User'])]
-    private $userPoiFinsihed;
+    private $userPoiFinished;
 
   
 
@@ -337,7 +337,7 @@ class Poi
      */ 
     public function getUserPoiFinsihed()
     {
-        return $this->userPoiFinsihed;
+        return $this->userPoiFinished;
     }
 
     /**
@@ -347,7 +347,7 @@ class Poi
      */ 
     public function setUserPoiFinsihed($userPoiFinsihed)
     {
-        $this->userPoiFinsihed = $userPoiFinsihed;
+        $this->userPoiFinished = $userPoiFinsihed;
 
         return $this;
     }

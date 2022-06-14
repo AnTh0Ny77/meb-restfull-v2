@@ -63,6 +63,8 @@ class GetGamesUserController extends AbstractController
                 foreach ($game->getQuests() as $quest) {
                     $questScores = $user->getQuestScores();
                     foreach ($questScores as $questScore) {
+                        $quest->setUserQuestScore(null);
+                        $quest->setUserQuestFinished(null);
                         if ($questScore->getQuestId()->getId() ==  $quest->getId()) {
                             $quest->setUserQuestScore($questScore->getScore());
                             $quest->setUserQuestFinished($questScore->getFinished());
@@ -71,6 +73,8 @@ class GetGamesUserController extends AbstractController
                     foreach ($quest->getPoi() as $poi) {
                         $poiScores = $user->getPoiScores();
                         foreach ($poiScores as $score) {
+                                $poi->setUserPoiScore(null);
+                                $poi->setUserPoiFinsihed(null);
                             if ($poi->getId()== $score->getPoi()->getId()) {
                                 $poi->setUserPoiScore($score->getScore());
                                 $poi->setUserPoiFinsihed($score->getFinished());

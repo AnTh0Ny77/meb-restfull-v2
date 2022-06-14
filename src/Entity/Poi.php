@@ -335,7 +335,7 @@ class Poi
     /**
      * Get the value of userPoiFinsihed
      */ 
-    public function getUserPoiFinsihed()
+    public function getUserPoiFinished()
     {
         return $this->userPoiFinished;
     }
@@ -345,7 +345,7 @@ class Poi
      *
      * @return  self
      */ 
-    public function setUserPoiFinsihed($userPoiFinsihed)
+    public function setUserPoiFinished($userPoiFinsihed)
     {
         $this->userPoiFinished = $userPoiFinsihed;
 

@@ -74,10 +74,10 @@ class GetGamesUserController extends AbstractController
                         $poiScores = $user->getPoiScores();
                         foreach ($poiScores as $score) {
                                 $poi->setUserPoiScore(null);
-                                $poi->setUserPoiFinsihed(null);
+                                $poi->setUserPoiFinished(null);
                             if ($poi->getId()== $score->getPoi()->getId()) {
                                 $poi->setUserPoiScore($score->getScore());
-                                $poi->setUserPoiFinsihed($score->getFinished());
+                                $poi->setUserPoiFinished($score->getFinished());
                             }
                         }
                     }

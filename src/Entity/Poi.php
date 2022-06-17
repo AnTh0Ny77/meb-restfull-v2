@@ -136,6 +136,12 @@ class Poi
     #[Groups(['read:Game:User'])]
     private $userPoiFinished;
 
+    #[Groups([ 'read:Game:User'])]
+    private $clueCoverUrl;
+
+    #[Groups(['read:Game:User'])]
+    private $clueText;
+
   
 
     public function __construct()
@@ -317,6 +323,10 @@ class Poi
      */ 
     public function getUserPoiScore()
     {
+        if (empty($this->userPoiScore)) {
+            $this->userPoiScore = 0;
+        }
+        
         return $this->userPoiScore;
     }
 
@@ -337,6 +347,9 @@ class Poi
      */ 
     public function getUserPoiFinished()
     {
+        if (empty($this->userPoiFinished)) {
+            $this->userPoiFinished = false;
+        }
         return $this->userPoiFinished;
     }
 
@@ -403,4 +416,47 @@ class Poi
         return $this->typePoiCoverUrl;
     }
 
+
+    /**
+     * Get the value of clueUrl
+     */ 
+    public function getClueUrl()
+    {
+        if (!empty($this->getImageClue())) {
+            $this->clueCoverUrl = 'api/Poi/' . $this->getId() . '/imageClue';
+        }
+        return $this->clueCoverUrl;
+    }
+
+    /**
+     * Set the value of clueUrl
+     *
+     * @return  self
+     */ 
+    public function setClueUrl($clueUrl)
+    {
+        $this->clueUrl = $clueUrl;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of clueText
+     */ 
+    public function getClueText()
+    {
+        return $this->getClue();
+    }
+
+    /**
+     * Set the value of clueText
+     *
+     * @return  self
+     */ 
+    public function setClueText($clueText)
+    {
+        $this->clueText = $clueText;
+
+        return $this;
+    }
 }

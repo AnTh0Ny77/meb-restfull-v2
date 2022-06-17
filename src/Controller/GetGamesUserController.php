@@ -52,9 +52,7 @@ class GetGamesUserController extends AbstractController
             return $this->json_response('401', 'user not found');
         } else {
 
-            if ($user->getConfirmed() != true) {
-                return $this->json_response('400', 'user need to be confirmed , see: api/user/guest/confirm');
-            } else{
+           
                 $game =  $request->get('data');
                 if (!$game instanceof Games) {
                     return $this->json_response('404', 'not found ');
@@ -63,27 +61,30 @@ class GetGamesUserController extends AbstractController
                 foreach ($game->getQuests() as $quest) {
                     $questScores = $user->getQuestScores();
                     foreach ($questScores as $questScore) {
-                        $quest->setUserQuestScore(null);
-                        $quest->setUserQuestFinished(null);
+                        $quest->setUserQuestScore(0);
+                        $quest->setUserQuestFinished(0);
                         if ($questScore->getQuestId()->getId() ==  $quest->getId()) {
                             $quest->setUserQuestScore($questScore->getScore());
                             $quest->setUserQuestFinished($questScore->getFinished());
                         }
+                        $this->em->flush($quest);
                     }
                     foreach ($quest->getPoi() as $poi) {
                         $poiScores = $user->getPoiScores();
                         foreach ($poiScores as $score) {
-                                $poi->setUserPoiScore(null);
-                                $poi->setUserPoiFinished(null);
+                                $poi->setUserPoiScore(0);
+                                $poi->setUserPoiFinished(0);
+                                
                             if ($poi->getId()== $score->getPoi()->getId()) {
                                 $poi->setUserPoiScore($score->getScore());
                                 $poi->setUserPoiFinished($score->getFinished());
                             }
+                            $this->em->flush($poi);
                         }
                     }
                 }
                 return $game;
-            }
+            
         }
     }
 }

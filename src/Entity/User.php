@@ -496,9 +496,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
     /**
      * @var File|null
      * @Assert\File(
-     *     maxSize = "2048k",
+     *     maxSize = "50000k",
      *     mimeTypes = {"image/jpeg", "image/png"},
-     *     mimeTypesMessage = "Please upload a valid cover image: jpeg or png under 2048k")
+     *     mimeTypesMessage = "Please upload a valid cover image: jpeg or png under 50000k")
      * @Vich\UploadableField(mapping="user_cover", fileNameProperty="coverPath")
      */
     private $file;

@@ -4,9 +4,11 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Entity\Games;
+use App\Entity\GameScore;
 use App\Entity\QrCode;
 use DateTimeImmutable;
 use App\Entity\UnlockGames;
+use App\Repository\GameScoreRepository;
 use App\Repository\UserRepository;
 use App\Repository\GamesRepository;
 use App\Repository\QuestRepository;
@@ -39,7 +41,7 @@ class GetGamesUserController extends AbstractController
         return $data;
     }
 
-    public function __invoke(Request $request, GamesRepository $gr, TokenGeneratorInterface $tk, MailerInterface $mailer, QuestRepository $questRep, UserRepository $ur, UnlockGamesRepository $urRep, UploaderHelper $helper)
+    public function __invoke(Request $request, GamesRepository $gr, GameScoreRepository $gsr  , TokenGeneratorInterface $tk, MailerInterface $mailer, QuestRepository $questRep, UserRepository $ur, UnlockGamesRepository $urRep, UploaderHelper $helper)
     {
         $user = $this->security->getUser();
         
@@ -54,10 +56,16 @@ class GetGamesUserController extends AbstractController
 
            
                 $game =  $request->get('data');
+               
                 if (!$game instanceof Games) {
                     return $this->json_response('404', 'not found ');
                 }
 
+                $game_score = $gsr->findOneBy(['game' => $game->getID(), 'user' => $user->getId()]);
+                if ($game_score instanceof GameScore) {
+                    $game->setUserGameScore($game_score->getScore());
+                } else { $game->setUserGameScore(0); }
+                $this->em->flush($game);
                 foreach ($game->getQuests() as $quest) {
                     $questScores = $user->getQuestScores();
                     foreach ($questScores as $questScore) {

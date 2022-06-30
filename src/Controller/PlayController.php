@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Poi;
 use App\Entity\User;
 use App\Entity\Games;
+use App\Entity\GameScore;
 use App\Entity\PoiScore;
 use App\Entity\Quest;
 use App\Entity\Score;
@@ -12,6 +13,7 @@ use App\Entity\Slide;
 use App\Entity\QrCode;
 use App\Entity\QuestScore;
 use App\Entity\UnlockGames;
+use App\Repository\GameScoreRepository;
 use App\Repository\UserRepository;
 use App\Repository\GamesRepository;
 use App\Repository\PoiScoreRepository;
@@ -77,6 +79,31 @@ class PlayController extends AbstractController
         $this->em->flush();
     }
 
+    public function set_game_score(Games $game ,User $user , GameScoreRepository $gr , QuestScoreRepository $qsr ){
+
+        $questArray = $game->getQuests();
+        $score = 0 ;
+        foreach ($questArray as $quest) {
+            if ($quest instanceof Quest) {
+                $questScore = $qsr->findOneBy(['questId' => $quest->getID(), 'userId' => $user->getId()]);
+                if ($questScore instanceof QuestScore) {
+                    $score += $questScore->getScore();
+                }
+            }
+        }
+        $gameScore = $gr->findOneBy(['game' => $game->getID(), 'user' => $user->getId()]);
+        if ($gameScore instanceof GameScore) {
+            $gameScore->setScore($score);
+        }else{
+            $gameScore = new GameScore();
+            $gameScore->setScore($score);
+            $gameScore->setUser($user);
+            $gameScore->setGame($game);
+        }
+            $this->em->persist($gameScore);
+            $this->em->flush();
+    }
+
     public function set_poi_score(Poi $poi , User $user , PoiScoreRepository $pr , ScoreRepository $sr){
             $poi_score = 0 ;
             $finished = 0 ;
@@ -119,7 +146,7 @@ class PlayController extends AbstractController
         return $score_already ;
     }
 
-    public function __invoke(Request $request, ScoreRepository $sr , GamesRepository $gr,QuestScoreRepository $qsr , PoiScoreRepository $pr ,  QuestRepository $questRep, UserRepository $ur, UnlockGamesRepository $urRep, UploaderHelper $helper)
+    public function __invoke(Request $request, ScoreRepository $sr , GameScoreRepository $grs ,  GamesRepository $gr,QuestScoreRepository $qsr , PoiScoreRepository $pr ,  QuestRepository $questRep, UserRepository $ur, UnlockGamesRepository $urRep, UploaderHelper $helper)
     {
         $user = $this->security->getUser();
         if (empty($user)) {
@@ -168,6 +195,7 @@ class PlayController extends AbstractController
                     $this->em->flush();
                     $this->set_poi_score($slide->getPoi() , $user , $pr , $sr );
                     $this->set_quest_score($slide->getPoi()->getQuest(), $user, $qsr, $sr);
+                    $this->set_game_score($game , $user , $grs  , $qsr );
                     $message = $slide->getTextSuccess();
                     $response = [
                         "message" => $message,
@@ -212,6 +240,7 @@ class PlayController extends AbstractController
                     $this->em->flush();
                     $this->set_poi_score($slide->getPoi(), $user, $pr, $sr);
                     $this->set_quest_score($slide->getPoi()->getQuest(), $user, $qsr, $sr);
+                    $this->set_game_score($game, $user, $grs, $qsr);
                     $response = [
                         "message" => $message,
                         "score" => $score->getPoint()
@@ -267,6 +296,7 @@ class PlayController extends AbstractController
                     $this->em->flush();
                     $this->set_poi_score($slide->getPoi(), $user, $pr, $sr);
                     $this->set_quest_score($slide->getPoi()->getQuest(), $user, $qsr, $sr);
+                    $this->set_game_score($game, $user, $grs, $qsr);
                     $response = [
                         "message" => $message,
                         "score" => $score->getPoint()
@@ -311,6 +341,7 @@ class PlayController extends AbstractController
                     $this->em->flush();
                     $this->set_poi_score($slide->getPoi(), $user, $pr, $sr);
                     $this->set_quest_score($slide->getPoi()->getQuest(), $user, $qsr, $sr);
+                    $this->set_game_score($game, $user, $grs, $qsr);
                     $response = [
                         "message" => $message,
                         "score" => $score->getPoint()

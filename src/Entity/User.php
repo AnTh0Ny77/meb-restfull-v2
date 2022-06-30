@@ -2,19 +2,21 @@
 
 namespace App\Entity;
 
+use App\Entity\GameScore;
 use App\Controller\MeController;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\RankRepository;
 use App\Repository\UserRepository;
 use App\Controller\PutUserController;
 use App\Controller\GetCoverController;
 use App\Controller\CoverUserController;
 use App\Controller\PostGuestController;
 use App\Controller\ConfirmGuestController;
+use App\Controller\ResetPasswordController;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
-use App\Controller\ResetPasswordController;
 use App\Controller\UpdatePasswordController;
-use App\Repository\RankRepository;
+use phpDocumentor\Reflection\Types\Nullable;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\HttpFoundation\File\File;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -25,7 +27,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Lexik\Bundle\JWTAuthenticationBundle\Security\User\JWTUserInterface;
-use phpDocumentor\Reflection\Types\Nullable;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 #[ApiResource(
@@ -501,6 +502,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
      *     mimeTypesMessage = "Please upload a valid cover image: jpeg or png under 50000k")
      * @Vich\UploadableField(mapping="user_cover", fileNameProperty="coverPath")
      */
+    
     private $file;
 
     #[ORM\OneToMany(mappedBy: 'User', targetEntity: Score::class)]
@@ -514,9 +516,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
     #[Groups(['read:Poi:User'])]
     private $poiScores;
 
+    
+
     #[ORM\ManyToOne(targetEntity: Rank::class, inversedBy: 'User')]
     #[Groups(['read:User'])]
     private $rank;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $phone;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: GameScore::class, orphanRemoval: true)]
+    private $GameScore;
 
 
     public function __construct()
@@ -527,6 +537,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
         $this->scores = new ArrayCollection();
         $this->questScores = new ArrayCollection();
         $this->poiScores = new ArrayCollection();
+        $this->Game = new ArrayCollection();
     }
 
 
@@ -803,8 +814,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
     
     private $forgotPasswordTokenMustBeVerifiedBefore;
 
-    #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $phone;
+  
 
     
 
@@ -925,4 +935,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
 
         return $this;
     }
+
+    /**
+     * @return Collection<int, GameScore>
+     */
+    public function getGame(): Collection
+    {
+        return $this->GameScore;
+    }
+
+    public function addGame(GameScore $GameScore): self
+    {
+        if (!$this->GameScore->contains($GameScore)) {
+            $this->GameScore[] = $GameScore;
+            $GameScore->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGame(GameScore $GameScore): self
+    {
+        if ($this->GameScore->removeElement($GameScore)) {
+            // set the owning side to null (unless already changed)
+            if ($GameScore->getUser() === $this) {
+                $GameScore->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    
 }

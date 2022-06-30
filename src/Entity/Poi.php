@@ -46,7 +46,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
             ]
         ],'getImageClue' => [
             'pagination_enabeld' => false,
-            'path' => '/Poi/{id}/imageClue',
+            'path' => '/poi/{id}/imageClue',
             'controller' => GetImageClueController::class,
             'read' => true,
             'method' => 'get',

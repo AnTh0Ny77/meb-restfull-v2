@@ -172,7 +172,8 @@ class Games
     #[ORM\ManyToMany(targetEntity: BagTools::class, mappedBy: 'Games')]
     private $bagTools;
 
-    
+    #[Groups(['read:Game:User'])]
+    private $userGameScore;
 
     public function __construct()
     {
@@ -288,4 +289,24 @@ class Games
     }
 
     
+
+    /**
+     * Get the value of userGameScore
+     */ 
+    public function getUserGameScore()
+    {
+        return $this->userGameScore;
+    }
+
+    /**
+     * Set the value of userGameScore
+     *
+     * @return  self
+     */ 
+    public function setUserGameScore($userGameScore)
+    {
+        $this->userGameScore = $userGameScore;
+
+        return $this;
+    }
 }

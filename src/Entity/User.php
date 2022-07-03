@@ -12,6 +12,7 @@ use App\Controller\GetCoverController;
 use App\Controller\CoverUserController;
 use App\Controller\PostGuestController;
 use App\Controller\ConfirmGuestController;
+use App\Controller\GetScoreControllerClass;
 use App\Controller\ResetPasswordController;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
@@ -41,6 +42,13 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
                 'openapi_context' => [
                     'security' => [['bearerAuth' => []]]
                 ]
+            ],
+            'getScore' => [
+                'pagination_enabeld' => false,
+                'path' => 'user/scores',
+                'method' => 'get',
+                'controller' => GetScoreControllerClass::class,
+                'read' => false,
             ], 
             'ResetPassword' => [
                 'pagination_enabeld' => false,

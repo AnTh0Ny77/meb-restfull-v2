@@ -53,8 +53,6 @@ class GetGamesUserController extends AbstractController
         if (!$user instanceof User) {
             return $this->json_response('401', 'user not found');
         } else {
-
-           
                 $game =  $request->get('data');
                
                 if (!$game instanceof Games) {

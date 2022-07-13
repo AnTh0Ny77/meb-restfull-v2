@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use DateTime;
+use DateInterval;
 use App\Entity\User;
 use App\Entity\Games;
 use App\Entity\QrCode;
@@ -12,15 +13,17 @@ use App\Repository\GamesRepository;
 use App\Repository\QuestRepository;
 use App\Repository\QrCodeRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
 use App\Repository\UnlockGamesRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Security;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\File\File;
+use Gesdinet\JWTRefreshTokenBundle\Model\RefreshTokenManagerInterface;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 
 class PutUserController extends AbstractController
 {
@@ -41,7 +44,7 @@ class PutUserController extends AbstractController
 
 
 
-    public function __invoke(Request $request, ValidatorInterface $validator, UserRepository $ur, UnlockGamesRepository $urRep, UploaderHelper $helper)
+    public function __invoke(Request $request, ValidatorInterface $validator, RefreshTokenManagerInterface $refreshTokenManager , UserRepository $ur, UnlockGamesRepository $urRep, JWTTokenManagerInterface $JWTManager , UploaderHelper $helper)
     {
         $user = $this->security->getUser();
         if (empty($user)) {
@@ -83,8 +86,19 @@ class PutUserController extends AbstractController
                     } else {
                         $this->em->persist($user);
                         $this->em->flush();
+                        
+                        $valid = new DateTime('now');
+                        $valid->add(new DateInterval('P30D'));
+                        $refreshToken = $refreshTokenManager->create();
+                        $refreshToken->setUsername($user->getUsername());
+                        $refreshToken->setRefreshToken();
+                        $refreshToken->setValid($valid);
+                        $refreshTokenManager->save($refreshToken);
+                        
                         $response = [
                             "response" => "user has been updated",
+                            'token' => $JWTManager->create($user),
+                            'refresh_token' => $refreshToken->getRefreshToken()
 
                         ];
                         $data = new JsonResponse($response, '200');

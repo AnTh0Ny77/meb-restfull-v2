@@ -11,6 +11,7 @@ use App\Controller\PutUserController;
 use App\Controller\GetCoverController;
 use App\Controller\CoverUserController;
 use App\Controller\PostGuestController;
+use App\Controller\DeleteUserController;
 use App\Controller\ConfirmGuestController;
 use App\Controller\GetScoreControllerClass;
 use App\Controller\ResetPasswordController;
@@ -42,7 +43,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
                 'openapi_context' => [
                     'security' => [['bearerAuth' => []]]
                 ]
-            ],
+                ],
             'getScore' => [
                 'pagination_enabeld' => false,
                 'path' => 'user/scores',
@@ -350,6 +351,15 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
                 'openapi_context' => [
                     'security' => [['bearerAuth' => []]]
                 ]
+        ], 'DeleteUser' => [
+            'pagination_enabeld' => false,
+            'path' => 'user/{id}/delete',
+            'controller' => DeleteUserController::class,
+            'read' =>  true,
+            'method' => 'delete',
+            'openapi_context' => [
+                'security' => [['bearerAuth' => []]]
+            ]
         ],
             'updatePassword' =>[
                 'pagination_enabeld' => false,

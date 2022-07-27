@@ -23,6 +23,7 @@ use App\Repository\QrCodeRepository;
 use App\Repository\QuestScoreRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\UnlockGamesRepository;
+use DateTime;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Routing\Annotation\Route;
@@ -146,8 +147,30 @@ class PlayController extends AbstractController
         return $score_already ;
     }
 
-    public function __invoke(Request $request, ScoreRepository $sr , GameScoreRepository $grs ,  GamesRepository $gr,QuestScoreRepository $qsr , PoiScoreRepository $pr ,  QuestRepository $questRep, UserRepository $ur, UnlockGamesRepository $urRep, UploaderHelper $helper)
-    {
+    public function check_game_clock(Games $game , User $user , UnlockGamesRepository $urRep , QrCodeRepository $qrp){
+       $unlockGamesCollection =  $urRep->findBy([ 'idUser' => $user->getId()]); 
+       foreach ($unlockGamesCollection as  $value) {
+            $qr = $qrp->findOneBy(['id' => $value->getQrCode()]);
+            $date = new DateTime('now');
+            if ($qr->getIdGame()->getId() == $game->getId()) {
+                if ($value->getFinish() == 1) {
+                    return true;
+                }else {
+                    if ($value->getDate() < $date) {
+                        $value->setFinish(1);
+                        $this->em->persist($value);
+                        $this->em->flush();
+                        return true;
+                    }
+                }
+            }
+       }
+       return false;
+    }
+
+    public function __invoke(Request $request, ScoreRepository $sr , GameScoreRepository $grs ,  
+    GamesRepository $gr,QuestScoreRepository $qsr , PoiScoreRepository $pr ,  QuestRepository $questRep, 
+    UserRepository $ur, UnlockGamesRepository $urRep, UploaderHelper $helper , QrCodeRepository $qrp){
         $user = $this->security->getUser();
         if (empty($user)) {
             return $this->json_response('401', 'JWT Token  not found');
@@ -164,10 +187,18 @@ class PlayController extends AbstractController
             }
             $score_already = $this->slide_already_play($slide , $user , $sr );
 
+            $game = $slide->getPoi()->getQuest()->getGame();
+
+            $finish = $this->check_game_clock($game , $user , $urRep , $qrp );
+
+            if ($finish == true ) {
+                return $this->json_response('400', 'Game is finish');
+            }
+
             if ($score_already instanceof Score) {
                 return $this->json_response('403', 'Slide ' . $slide->getName() . ' was already play by user ' . $user->getUsername() . ' ');
             }
-            $game = $slide->getPoi()->getQuest()->getGame();
+            
 
             $verify = $urRep->findUnlockedr($user->getId(), intval($game->getId()));
            
@@ -310,7 +341,7 @@ class PlayController extends AbstractController
                         return $this->json_response('500', 'wrong data base configutation for slide type (empty response list)');
                     }
                     $answer = json_decode($request->getContent());
-                    if (empty($answer)) {
+                    if (empty($answer) or !isset($answer)) {
                         return $this->json_response('400', 'answer cannot be null or empty ');
                     }
                     $true = false;

@@ -42,6 +42,33 @@ class GetGamesUserController extends AbstractController
         return $data;
     }
 
+    public function returnPartner(Games $game , User $user , UnlockGamesRepository $urRep, QrCodeRepository $qrp ){
+        $unlockGamesCollection =  $urRep->findBy(['idUser' => $user->getId()]);
+        foreach ($unlockGamesCollection as  $value) {
+            $qr = $qrp->findOneBy(['id' => $value->getQrCode()]);
+            if ($qr->getIdGame()->getId() == $game->getId()) {
+                $partner = $qr->getIdClient();
+                if ($partner instanceof User) {
+                    $location = $partner->getLocation();
+                    $phone = $partner->getPhone();
+                    $name = $partner->getUsername();
+                    $lat = $location['lat'];
+                    $lng = $location['lng'];
+                    $partner = [
+                        $name , 
+                        $phone ,
+                        $lat ,
+                        $lng
+                    ];
+                    return  $partner;
+                }else {
+                    return null;
+                }
+            }
+        }
+        return null;
+    }
+
     public function check_game_clock(Games $game, User $user, UnlockGamesRepository $urRep, QrCodeRepository $qrp)
     {
         $unlockGamesCollection =  $urRep->findBy(['idUser' => $user->getId()]);
@@ -86,6 +113,9 @@ class GetGamesUserController extends AbstractController
                 if ($finish == true ) {
                     return $this->json_response('400', 'Game is finish');
                 }
+
+                $partner = $this->returnPartner($game, $user, $urRep, $qrp);
+                $game->setPartner($partner);
 
                 $game_score = $gsr->findOneBy(['game' => $game->getID(), 'user' => $user->getId()]);
                 if ($game_score instanceof GameScore) {

@@ -175,6 +175,9 @@ class Games
     #[Groups(['read:Game:User'])]
     private $userGameScore;
 
+    #[Groups(['read:Game:User'])]
+    private $partner;
+
     public function __construct()
     {
         $this->quests = new ArrayCollection();
@@ -306,6 +309,19 @@ class Games
     public function setUserGameScore($userGameScore)
     {
         $this->userGameScore = $userGameScore;
+
+        return $this;
+    }
+
+   
+    public function getPartner()
+    {
+        return $this->partner;
+    }
+
+    public function setPartner($partner)
+    {
+        $this->partner = $partner;
 
         return $this;
     }

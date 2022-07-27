@@ -546,6 +546,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: GameScore::class, orphanRemoval: true)]
     private $GameScore;
 
+    #[ORM\Column(type: 'json', nullable: true)]
+    private $location = [];
+
+    
 
     public function __construct()
     {
@@ -832,9 +836,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
     
     private $forgotPasswordTokenMustBeVerifiedBefore;
 
-  
-
-    
 
     /**
      * Get the value of forgotPasswordToken
@@ -980,6 +981,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
                 $GameScore->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getLocation(): ?array
+    {
+        return $this->location;
+    }
+
+    public function setLocation(?array $location): self
+    {
+        $this->location = $location;
 
         return $this;
     }

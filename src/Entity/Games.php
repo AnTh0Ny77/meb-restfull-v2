@@ -178,6 +178,10 @@ class Games
     #[Groups(['read:Game:User'])]
     private $partner;
 
+    #[ORM\Column(type: 'text', nullable: true)]
+    #[Groups(['read:Game:User'])]
+    private $rules;
+
     public function __construct()
     {
         $this->quests = new ArrayCollection();
@@ -322,6 +326,18 @@ class Games
     public function setPartner($partner)
     {
         $this->partner = $partner;
+
+        return $this;
+    }
+
+    public function getRules(): ?string
+    {
+        return $this->rules;
+    }
+
+    public function setRules(?string $rules): self
+    {
+        $this->rules = $rules;
 
         return $this;
     }

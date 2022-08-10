@@ -28,11 +28,9 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class GetCoverTypePoiController extends AbstractController
-{
+class GetCoverTypePoiController extends AbstractController{
 
-    public function __construct(private Security $security)
-    {
+    public function __construct(private Security $security){
     }
     public function json_response(string $code, string $message)
     {
@@ -43,8 +41,7 @@ class GetCoverTypePoiController extends AbstractController
         return $data;
     }
 
-    public function __invoke(Request $request)
-    {
+    public function __invoke(Request $request){
         $typePoi =  $request->get('data');
 
         if (!$typePoi instanceof TypePoi) {
@@ -65,9 +62,6 @@ class GetCoverTypePoiController extends AbstractController
             $response->headers->set('Content-Type', $mime);
             $response->setContent(file_get_contents($path));
             return $response;
-            // $stream  = new Stream($path);
-            // $response = new BinaryFileResponse($stream);
-            // return $response;
         } else {
             return $this->json_response('400', 'no cover for type poi: ' . $typePoi->getName() . '');
         }

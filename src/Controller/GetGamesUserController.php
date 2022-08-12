@@ -110,9 +110,9 @@ class GetGamesUserController extends AbstractController
                 }
 
                 $finish = $this->check_game_clock($game , $user , $urRep , $qrp );
-                if ($finish == true ) {
-                    return $this->json_response('400', 'Game is finish');
-                }
+                // if ($finish == true ) {
+                //     return $this->json_response('400', 'Game is finish');
+                // }
 
                 $partner = $this->returnPartner($game, $user, $urRep, $qrp);
                 $game->setPartner($partner);

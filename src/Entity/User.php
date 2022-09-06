@@ -10,6 +10,7 @@ use App\Repository\UserRepository;
 use App\Controller\PutUserController;
 use App\Controller\GetCoverController;
 use App\Controller\CoverUserController;
+use App\Controller\GetClientController;
 use App\Controller\PostGuestController;
 use App\Controller\DeleteUserController;
 use App\Controller\ConfirmGuestController;
@@ -360,6 +361,18 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
             'openapi_context' => [
                 'security' => [['bearerAuth' => []]]
             ]
+        ], 'getClient' => [
+            'pagination_enabeld' => false,
+            'method' => 'get',
+            'path' => '/user/{id}/client',
+            'controller' => GetClientController::class,
+            'security' => 'is_granted("ROLE_CLIENT")',
+            'openapi_context' => [
+                'security' =>
+                [['bearerAuth' => []]],
+                'summary' => 'Client - retrieves a client data ( need a client role )',
+            ],
+            'normalization_context' => ['groups' => ['read:Client:User']]
         ],
             'updatePassword' =>[
                 'pagination_enabeld' => false,
@@ -431,7 +444,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['read:User'])]
+    #[Groups(['read:User' , 'read:Client:User'])]
     private $id;
 
     /**
@@ -440,11 +453,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
     * )
     */
     #[ORM\Column(type: 'string', length: 180, unique: true , nullable: true)]
-    #[Groups(['read:User'])]
+    #[Groups(['read:User' , 'read:Client:User'])]
     private $email;
 
     #[ORM\Column(type: 'json')]
-    #[Groups(['read:User'])]
+    #[Groups(['read:User' , 'read:Client:User'])]
     private $roles = [];
 
     #[ORM\Column(type: 'string' , nullable: true)]
@@ -460,14 +473,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
     * @Assert\NotBlank
     */
     #[ORM\Column(type: 'string', length: 255 , unique: true)]
-    #[Groups(['read:User'])]
+    #[Groups(['read:User' , 'read:Client:User'])]
     public $username;
 
     #[ORM\Column(type: 'datetime')]
     private $createdAt;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
-    #[Groups(['read:User'])]
+    #[Groups(['read:User' , 'read:Client:User'])]
     private $updatedAt;
 
     #[ORM\Column(type: 'boolean' )]
@@ -483,7 +496,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
      * )
      */
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
-    #[Groups(['read:User'])]
+    #[Groups(['read:User' , 'read:Client:User'])]
     private $name;
 
     /**
@@ -495,7 +508,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
      * )
      */
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
-    #[Groups(['read:User'])]
+    #[Groups(['read:User' , 'read:Client:User'])]
     private $firstName;
 
     /**
@@ -509,15 +522,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
     private $PlainPassword;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(['read:User'])]
+    #[Groups(['read:User', 'read:Client:User'])]
     private $coverPath;
 
     /**
      * @var File|null
      * @Assert\File(
-     *     maxSize = "50000k",
+     *     maxSize = "64M",
      *     mimeTypes = {"image/jpeg", "image/png"},
-     *     mimeTypesMessage = "Please upload a valid cover image: jpeg or png under 50000k")
+     *     mimeTypesMessage = "Please upload a valid cover image: jpeg or png under 64M")
      * @Vich\UploadableField(mapping="user_cover", fileNameProperty="coverPath")
      */
     
@@ -541,6 +554,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
     private $rank;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['read:User' , 'read:Client:User'])]
     private $phone;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: GameScore::class, orphanRemoval: true)]
@@ -549,7 +563,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
     #[ORM\Column(type: 'json', nullable: true)]
     private $location = [];
 
-    
+
+    #[ORM\OneToMany(mappedBy: 'User', targetEntity: ClientGames::class)]
+    #[Groups(['read:Client:User'])]
+    private $clientGames;
+
+    #[ORM\Column(type: 'boolean')]
+    #[Groups(['read:Client:User'])]
+    private $clientInfiniteQr;
+
+    #[ORM\Column(type: 'float', nullable: true)]
+    #[Groups(['read:Client:User'])]
+    private $exploreCoin;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    #[Groups(['read:Client:User'])]
+    private $bagNumber;
 
     public function __construct()
     {
@@ -560,6 +589,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
         $this->questScores = new ArrayCollection();
         $this->poiScores = new ArrayCollection();
         $this->Game = new ArrayCollection();
+        $this->clientGames = new ArrayCollection();
     }
 
 
@@ -837,6 +867,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
     private $forgotPasswordTokenMustBeVerifiedBefore;
 
 
+
     /**
      * Get the value of forgotPasswordToken
      */ 
@@ -993,6 +1024,72 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
     public function setLocation(?array $location): self
     {
         $this->location = $location;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ClientGames>
+     */
+    public function getClientGames(): Collection
+    {
+        return $this->clientGames;
+    }
+
+    public function addClientGame(ClientGames $clientGame): self
+    {
+        if (!$this->clientGames->contains($clientGame)) {
+            $this->clientGames[] = $clientGame;
+            $clientGame->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeClientGame(ClientGames $clientGame): self
+    {
+        if ($this->clientGames->removeElement($clientGame)) {
+            // set the owning side to null (unless already changed)
+            if ($clientGame->getUser() === $this) {
+                $clientGame->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getClientInfiniteQr(): ?bool
+    {
+        return $this->clientInfiniteQr;
+    }
+
+    public function setClientInfiniteQr(bool $clientInfiniteQr): self
+    {
+        $this->clientInfiniteQr = $clientInfiniteQr;
+
+        return $this;
+    }
+
+    public function getExploreCoin(): ?float
+    {
+        return $this->exploreCoin;
+    }
+
+    public function setExploreCoin(?float $exploreCoin): self
+    {
+        $this->exploreCoin = $exploreCoin;
+
+        return $this;
+    }
+
+    public function getBagNumber(): ?int
+    {
+        return $this->bagNumber;
+    }
+
+    public function setBagNumber(?int $bagNumber): self
+    {
+        $this->bagNumber = $bagNumber;
 
         return $this;
     }

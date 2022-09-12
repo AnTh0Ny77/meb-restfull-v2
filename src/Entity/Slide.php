@@ -13,9 +13,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 #[ORM\Entity(repositoryClass: SlideRepository::class)]
-#[ApiFilter(SearchFilter::class, properties: ['Poi' => 'exact'])]
+#[ApiFilter(SearchFilter::class, properties: ['poi' => 'exact'])]
 #[ApiResource(
-    order: ["Step" => "ASC"],
+    order: ["step" => "ASC"],
     collectionOperations: [
         'get' => [
             'pagination_enabeld' => false,
@@ -26,23 +26,25 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
                 'security' => [['bearerAuth' => []]],
                 'summary' => 'retrieves a Slide collection',
             ]
-        ], 'getOutLine' => [
-            'pagination_enabeld' => false,
-            'path' => 'slides/offline',
-            'method' => 'get',
-            'security' => 'is_granted("ROLE_USER")',
-            'normalization_context' => ['groups' => 'read:Slide:Offline'],
-            'openapi_context' => [
-                'security' => [['bearerAuth' => []]],
-                'summary' => 'retrieves a Slide collection with response for Outline parts',
-            ]
         ]
+        // 'getOutLine' => [
+        //     'pagination_enabeld' => false,
+        //     'path' => 'slides/offline',
+        //     'method' => 'get',
+        //     'security' => 'is_granted("ROLE_USER")',
+        //     'normalization_context' => ['groups' => 'read:Slide:Offline'],
+        //     'openapi_context' => [
+        //         'security' => [['bearerAuth' => []]],
+        //         'summary' => 'retrieves a Slide collection with response for Outline parts',
+        //     ]
+        // ]
     ],itemOperations:[
         'get' => [
             'pagination_enabeld' => false,
             'method' => 'get',
-            'normalization_context' => ['groups' => 'read:One:Slide'],
+            'normalization_context' => ['groups' => 'read:Slide'],
             'openapi_context' => [
+                'security' => [['bearerAuth' => []]],
                 'summary' => 'public - retrieves a single Slide ',
             ]
             ], "GetCover" => [
@@ -75,22 +77,19 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
             'openapi_context' => [
                 'security' => [['bearerAuth' => []]],
                 'summary' => 'retrieves the image for the slide qcm photo',
-                'requestBody' => [
-                    'content' => [
-                        'application/json' => [
-                            'schema'  => [
-                                'type'       => 'object',
-                                'properties' =>
-                                [
-                                    'index'  => ['type' => 'integer']
-                                ],
-                            ],
-                            'example' => [
-                                'index'        =>  1
-                            ],
-                        ],
-                    ],
-                ],
+                "parameters" => [
+                       [
+                          "name" => "index",
+                           "in" => "query",
+                          "description" => "index of response",
+                           "required" => true,
+                          "type" => "integer",
+                          "items" => [
+                               "type" => "integer"
+                           ]
+                       ]
+                   ],
+                
                 "responses" => [
                     "200" => [
                         "description" => "file",
@@ -117,7 +116,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
                 'description' => 'Requete un peu différente puisque je vérifie que le game est bien disponible pour l utilisateur voir unlock/games, normalement le slide n est 
                 jouable qu une seule fois mais j ai desactivé le controle pour faciliter le developpement seul les slides de type QCM et question ouverte nécéssitent de passer la varialbe
                 answer dans le body , pour les autres slides l APi ne tiendra pas compte du contenu du body donc merci de passer un json vide, les Defis photos ne peuvent pas etre joués
-                par cette requete ', 
+                par cette requete . La variable isAccepted  n est nécéssaire que pour les types :  Question', 
                 'read' => false,
                 'requestBody' => [
                     'content' => [
@@ -126,11 +125,13 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
                                 'type'       => 'object',
                                 'properties' =>
                                 [
-                                    'answer'  => ['type' => 'string']
+                                    'answer'  => ['type' => 'string'],
+                                    'isAccepted'  => ['type' => 'boolean']
                                 ],
                             ],
                             'example' => [
-                                'answer'        => 'Citron'
+                                'answer'        => 'Citron',
+                                'isAccepted'        => true
                             ],
                         ],
                     ],
@@ -176,58 +177,64 @@ class Slide
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['read:Slide'])]
+    #[Groups(['read:Slide' , 'read:Game' , 'read:Poi' , 'read:Game:User'])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 100)]
-    #[Groups(['read:Slide' , 'read:Slide:Offline' , 'read:Game' ])]
-    private $Name;
+    #[Groups(['read:Slide' , 'read:Slide:Offline' , 'read:Game' , 'read:Poi' , 'read:Game:User' ])]
+    private $name;
 
     #[ORM\Column(type: 'text', nullable: true)]
-    #[Groups(['read:Slide' , 'read:Slide:Offline' , 'read:Game'])]
-    private $Text;
+    #[Groups(['read:Slide' , 'read:Slide:Offline' , 'read:Game' , 'read:Poi' , 'read:Game:User'])]
+    private $text;
 
     #[ORM\Column(type: 'text', nullable: true)]
-    #[Groups(['read:Slide', 'read:Slide:Offline', 'read:Game'])]
-    private $TextSuccess;
+    #[Groups(['read:Slide', 'read:Slide:Offline', 'read:Game' , 'read:Poi' , 'read:Game:User'])]
+    private $textSuccess;
 
     #[ORM\Column(type: 'text', nullable: true)]
-    #[Groups(['read:Slide', 'read:Slide:Offline' , 'read:Game'])]
-    private $TextFail;
+    #[Groups(['read:Slide', 'read:Slide:Offline' , 'read:Game' , 'read:Poi' , 'read:Game:User'])]
+    private $textFail;
 
     #[ORM\Column(type: 'integer', nullable: true)]
-    #[Groups(['read:Slide', 'read:Slide:Offline' , 'read:Game'])]
-    private $Time;
+    private $time;
 
     #[ORM\Column(type: 'integer', nullable: true)]
-    #[Groups(['read:Slide' , 'read:Slide:Offline' , 'read:Game'])]
-    private $Step;
+    #[Groups(['read:Slide' , 'read:Slide:Offline' , 'read:Game' , 'read:Poi' , 'read:Game:User'])]
+    private $step;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(['read:Slide', 'read:Slide:Offline' ])]
-    private $Response;
+    #[Groups(['read:Slide', 'read:Slide:Offline' ,  'read:Game' , 'read:Poi' , 'read:Game:User'])]
+    private $response;
 
     #[ORM\Column(type: 'boolean')]
-    #[Groups(['read:Slide', 'read:Slide:Offline' , 'read:Game'])]
-    private $Penality;
+    #[Groups(['read:Slide', 'read:Slide:Offline' , 'read:Game' , 'read:Poi' , 'read:Game:User'])]
+    private $penality;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(['read:Slide', 'read:Slide:Offline' , 'read:Game'])]
-    private $CoverPath;
+    private $coverPath;
+
+    #[Groups(['read:Slide', 'read:Slide:Offline', 'read:Game', 'read:Poi' , 'read:Game:User'])]
+    private $coverUrl;
 
     #[ORM\ManyToOne(targetEntity: Poi::class, inversedBy: 'slides')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['read:One:Slide' , 'read:Slide:Offline'])]
-    private $Poi;
+    #[Groups(['read:One:Slide' , 'read:Slide:Offline' , 'read:Poi'])]
+    private $poi;
 
     #[ORM\ManyToOne(targetEntity: TypeSlide::class, inversedBy: 'Slide')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['read:Slide'])]
     private $typeSlide;
 
+    #[Groups(['read:Slide', 'read:Game', 'read:Poi' , 'read:Game:User'])]
+    private $typeSlideId;
+
+    #[Groups(['read:Slide', 'read:Game', 'read:Poi', 'read:Game:User'])]
+    private $typeSlideName;
+
     #[ORM\Column(type: 'string', length: 150, nullable: true)]
-    #[Groups([ 'read:Slide:Offline'])]
-    private $Solution;
+    #[Groups([ 'read:Slide:Offline' , 'read:Slide' , 'read:Game' , 'read:Poi',  'read:Game:User'])]
+    private $solution;
 
     public function getId(): ?int
     {
@@ -236,12 +243,12 @@ class Slide
 
     public function getName(): ?string
     {
-        return $this->Name;
+        return $this->name;
     }
 
-    public function setName(string $Name): self
+    public function setName(string $name): self
     {
-        $this->Name = $Name;
+        $this->name = $name;
 
         return $this;
     }
@@ -251,63 +258,63 @@ class Slide
         $type = $this->getTypeSlide();
         $pattern = ";";
         if ($type->getId() == 3) {
-            $text =  explode(';',  $this->Text);
+            $text =  explode(';',  $this->text);
             return $text;
         }
-        return $this->Text;
+        return $this->text;
     }
 
-    public function setText(?string $Text): self
+    public function setText(?string $text): self
     {
-        $this->Text = $Text;
+        $this->text = $text;
 
         return $this;
     }
 
     public function getTextSuccess(): ?string
     {
-        return $this->TextSuccess;
+        return $this->textSuccess;
     }
 
-    public function setTextSuccess(?string $TextSuccess): self
+    public function setTextSuccess(?string $textSuccess): self
     {
-        $this->TextSuccess = $TextSuccess;
+        $this->textSuccess = $textSuccess;
 
         return $this;
     }
 
     public function getTextFail(): ?string
     {
-        return $this->TextFail;
+        return $this->textFail;
     }
 
-    public function setTextFail(?string $TextFail): self
+    public function setTextFail(?string $textFail): self
     {
-        $this->TextFail = $TextFail;
+        $this->textFail = $textFail;
 
         return $this;
     }
 
     public function getTime(): ?int
     {
-        return $this->Time;
+        return $this->time;
     }
 
-    public function setTime(?int $Time): self
+    public function setTime(?int $time): self
     {
-        $this->Time = $Time;
+        $this->Time = $time;
 
         return $this;
     }
 
     public function getStep(): ?int
     {
-        return $this->Step;
+        return $this->step;
     }
 
-    public function setStep(?int $Step): self
+    public function setStep(?int $step): self
     {
-        $this->Step = $Step;
+        $this->step = $step;
 
         return $this;
     }
@@ -317,64 +324,84 @@ class Slide
         $type = $this->getTypeSlide();
         $pattern = ";";
         if ($type->getId() == 2){
-            $Response =  explode(';',  $this->Response);
+            $Response =  explode(';',  $this->response);
             shuffle($Response);
             return $Response  ;
         }elseif ($type->getId() == 4) {
             return null;
         }
         elseif ($type->getId() == 5) {
-            $Response =  explode(';',  $this->Response);
+            $Response =  explode(';',  $this->response);
             $temp = [];
             $i = 0;
             foreach ($Response as $key => $image) {
                 $i ++;
-               $temp[$i] = $image;
+               $temp[$i] = 'api/slides/' .$this->getId() . '/qcmp?index=' . $i;
             }
             return $temp;
         }
-        return $this->Response;
+        return $this->response;
+    }
+    
+    public function getUrlQcmp(){
+        $Response =  explode(';',  $this->response);
+        $temp = [];
+        $i = 0;
+        foreach ($Response as $key => $image) {
+            $i++;
+            $temp[$i] = $image;
+        }
+        return $temp;
     }
 
-    public function setResponse(?string $Response): self
+    public function setResponse(?string $response): self
     {
-        $this->Response = $Response;
+        $this->response = $response;
 
         return $this;
     }
 
     public function getPenality(): ?bool
     {
-        return $this->Penality;
+        return $this->penality;
     }
 
-    public function setPenality(bool $Penality): self
+    public function setPenality(bool $penality): self
     {
-        $this->Penality = $Penality;
+        $this->penality = $penality;
 
         return $this;
     }
 
     public function getCoverPath(): ?string
     {
-        return $this->CoverPath;
+        return $this->coverPath;
     }
 
-    public function setCoverPath(?string $CoverPath): self
+    public function getCoverUrl()
     {
-        $this->CoverPath = $CoverPath;
+        if (!empty($this->getCoverPath())){
+            $this->coverUrl = 'api/slides/' . $this->getId() . '/cover';
+            return $this->coverUrl;
+        }
+        return null;
+    }
+
+    public function setCoverPath(?string $coverPath): self
+    {
+        $this->coverPath = $coverPath;
 
         return $this;
     }
 
     public function getPoi(): ?Poi
     {
-        return $this->Poi;
+        return $this->poi;
     }
 
-    public function setPoi(?Poi $Poi): self
+    public function setPoi(?Poi $poi): self
     {
-        $this->Poi = $Poi;
+        $this->poi = $poi;
 
         return $this;
     }
@@ -382,6 +409,12 @@ class Slide
     public function getTypeSlide(): ?TypeSlide
     {
         return $this->typeSlide;
+    }
+
+    public function getTypeSlideId()
+    {
+        $this->typeSlideId = $this->getTypeSlide()->getId();
+        return $this->typeSlideId;
     }
 
     public function setTypeSlide(?TypeSlide $typeSlide): self
@@ -393,12 +426,35 @@ class Slide
 
     public function getSolution(): ?string
     {
-        return $this->Solution;
+        return $this->solution;
     }
 
-    public function setSolution(?string $Solution): self
+    public function setSolution(?string $solution): self
     {
-        $this->Solution = $Solution;
+        $this->solution = $solution;
+
+        return $this;
+    }
+
+    
+
+    /**
+     * Get the value of typeSlideName
+     */ 
+    public function getTypeSlideName()
+    {
+        $this->typeSlideName = $this->getTypeSlide()->getName();
+        return $this->typeSlideName;
+    }
+
+    /**
+     * Set the value of typeSlideName
+     *
+     * @return  self
+     */ 
+    public function setTypeSlideName($typeSlideName)
+    {
+        $this->typeSlideName = $typeSlideName;
 
         return $this;
     }

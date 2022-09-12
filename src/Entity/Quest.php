@@ -2,52 +2,18 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use App\Controller\GetQuestController;
-use App\Repository\QuestRepository;
-use Symfony\Component\Serializer\Annotation\Groups;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\QuestRepository;
+use App\Controller\GetQuestController;
+use App\Controller\PlayQuestController;
+use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: QuestRepository::class)]
 #[ApiResource(
     collectionOperations: [
-        // 'GetGames' => [
-        //     'pagination_enabeld' => false,
-        //     'controller' => GetQuestController::class,
-        //     'method' => 'get',
-        //     'openapi_context' => [
-        //         "parameters" => [
-        //             [
-        //                 "name" => "game_id",
-        //                 "in" => "query",
-        //                 "required" => true,
-        //                 "type" => "integer"
-        //             ]
-        //         ],
-        //         'security' => [['bearerAuth' => []]],
-        //         'summary' => 'retrieves a Quest collection with the game id ( the game must have been unlocked )',
-        //         "responses" => [
-        //             "200" => [
-        //                 "content" => [
-        //                     "application/json" => [
-        //                         "schema" =>  [
-        //                             "properties" => [
-        //                                 "quest" => [
-        //                                     "type" => "string"
-        //                                 ]
-        //                             ]
-        //                         ]
-        //                     ]
-        //                 ]
-        //             ],
-        //             "401" => [
-        //                 "description" => "invalid request"
-        //             ]
-        //         ]
-        //     ]
-        // ], 
         'get' => [
             'pagination_enabeld' => false,
             'method' => 'get',
@@ -65,6 +31,35 @@ use Doctrine\ORM\Mapping as ORM;
             'openapi_context' => [
                 'summary' => 'public - retrieves a single Quest   ',
             ]
+        ], 'play' => [
+                'pagination_enabeld' => false,
+                'path' => '/quest/{id}/play',
+                'controller' => PlayQuestController::class,
+                'deserialize' => false,
+                'method' => 'post',
+                'security' => 'is_granted("ROLE_USER")',
+                'openapi_context' => [
+                    'security' =>
+                    [['bearerAuth' => []]],
+                    'summary' => '',
+                    'read' => false,
+                    'requestBody' => [
+                        'content' => [
+                            'application/json' => [
+                                'schema'  => [
+                                    'type'       => 'object',
+                                    'properties' =>
+                                    [
+                                        'isAccepted'  => ['type' => 'boolean']
+                                    ],
+                                ],
+                                'example' => [
+                                    'isAccepted'        => true
+                                ],
+                            ],
+                        ]
+                    ]
+                ]
         ]
     ]
 )]
@@ -73,28 +68,35 @@ class Quest
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['read:Quest', 'read:oneQuest', 'read:Game'])]
+    #[Groups(['read:Quest', 'read:oneQuest', 'read:Game' , 'read:Game:User'])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 100)]
-    #[Groups(['read:Quest' , 'read:oneQuest' , 'read:Game'])]
+    #[Groups(['read:Quest' , 'read:oneQuest' , 'read:Game' , 'read:Game:User'])]
     private $name;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
-    #[Groups(['read:Quest', 'read:oneQuest' , 'read:Game'])]
+    #[Groups(['read:Quest', 'read:oneQuest' , 'read:Game' , 'read:Game:User'])]
     private $color;
 
     #[ORM\ManyToOne(targetEntity: Games::class, inversedBy: 'quests')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['read:Quest', 'read:oneQuest'])]
+    #[Groups(['read:Quest', 'read:oneQuest' ])]
     private $game;
 
-    #[ORM\OneToMany(mappedBy: 'Quest', targetEntity: Poi::class)]
-    #[Groups([ 'read:oneQuest' , 'read:Game'])]
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['read:oneQuest', 'read:Game' , 'read:Game:User'])]
+    private $responseQuest;
+
+    #[ORM\OneToMany(mappedBy: 'quest', targetEntity: Poi::class)]
+    #[Groups([ 'read:oneQuest' , 'read:Game' , 'read:Game:User'])]
     private $poi;
 
-    #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $ResponseQuest;
+    #[Groups(['read:Game:User'])]
+    private $userQuestScore;
+
+    #[Groups(['read:Game:User'])]
+    private $userQuestFinished;
 
     public function __construct()
     {
@@ -174,12 +176,52 @@ class Quest
 
     public function getResponseQuest(): ?string
     {
-        return $this->ResponseQuest;
+        return $this->responseQuest;
     }
 
-    public function setResponseQuest(?string $ResponseQuest): self
+    public function setResponseQuest(?string $responseQuest): self
     {
-        $this->ResponseQuest = $ResponseQuest;
+        $this->responseQuest = $responseQuest;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of userQuestScore
+     */ 
+    public function getUserQuestScore()
+    {
+        return $this->userQuestScore;
+    }
+
+    /**
+     * Set the value of userQuestScore
+     *
+     * @return  self
+     */ 
+    public function setUserQuestScore($userQuestScore)
+    {
+        $this->userQuestScore = $userQuestScore;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of userQuestFinished
+     */ 
+    public function getUserQuestFinished()
+    {
+        return $this->userQuestFinished;
+    }
+
+    /**
+     * Set the value of userQuestFinished
+     *
+     * @return  self
+     */ 
+    public function setUserQuestFinished($userQuestFinished)
+    {
+        $this->userQuestFinished = $userQuestFinished;
 
         return $this;
     }

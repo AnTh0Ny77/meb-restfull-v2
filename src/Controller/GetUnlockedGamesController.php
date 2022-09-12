@@ -49,12 +49,20 @@ class GetUnlockedGamesController extends AbstractController
                 }else{
                     $array_game = [];
                     foreach ($list as $key => $value){
+
+                        $qr_code = $qrRep->findOneBy(["id" => $value['qr_code_id']]);
+                        if ($qr_code instanceof QrCode) {
+                            $phone = $qr_code->getIdClient()->getPhone();
+                        } else $phone = null;
+                        
                         $game = [
+                            
                             "id" => $value['id_game_id'],
                             "name" => $value['name'], 
                             "destination" => $value['destination'],
                             "date" => $value['date'] , 
-                            "finish" => $value['finish']
+                            "finish" => $value['finish'],
+                            "phone" => $phone
                         ];
                         array_push($array_game,$game);
                     }

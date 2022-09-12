@@ -5,6 +5,7 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\GamesRepository;
 use App\Controller\FinishGameController;
+use App\Controller\GetGamesUserController;
 use App\Controller\GetCoverGamesController;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
@@ -66,7 +67,21 @@ use Symfony\Component\Serializer\Annotation\Groups;
                 'summary' => 'public - retrieves a single game',
             ],
             'normalization_context' => ['groups' => ['read:Game']]
-        ], 'SetFinish' => [
+        ],
+        'getUserGames' => [
+            'pagination_enabeld' => false,
+            'path' => 'games/{id}/user',
+            'method' => 'get',
+            'controller' => GetGamesUserController::class,
+            'security' => 'is_granted("ROLE_USER")',
+            'openapi_context' => [
+                'security' =>
+                [['bearerAuth' => []]],
+                'summary' => 'public - retrieves a single game',
+            ],
+            'normalization_context' => ['groups' => ['read:Game:User']]
+        ],
+        'SetFinish' => [
             'pagination_enabeld' => false,
             'method' => 'put',
             'path' => 'games/{id}/finish',
@@ -133,27 +148,39 @@ class Games
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups([ 'read:Games' , 'read:Game'])]
+    #[Groups([ 'read:Games' , 'read:Game' , 'read:Game:User' ])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 100)]
-    #[Groups(['read:Games' , 'read:Game'])]
-    private $Name;
+    #[Groups(['read:Games' , 'read:Game' ,  'read:Game:User'])]
+    private $name;
 
     #[ORM\Column(type: 'string', length: 10, nullable: true)]
-    #[Groups(['read:Games' , 'read:Game'])]
-    private $Destination;
+    #[Groups(['read:Games' , 'read:Game' , 'read:Game:User'])]
+    private $destination;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(['read:Games', 'read:Game'])]
-    private $CoverPath;
+    private $coverPath;
+
+    #[Groups(['read:Games', 'read:Game' , 'read:Game:User'])]
+    private $coverUrl;
 
     #[ORM\OneToMany(mappedBy: 'game', targetEntity: Quest::class, orphanRemoval: true)]
-    #[Groups(['read:Games', 'read:Game'])]
+    #[Groups(['read:Games', 'read:Game' , 'read:Game:User'])]
     private $quests;
 
     #[ORM\ManyToMany(targetEntity: BagTools::class, mappedBy: 'Games')]
     private $bagTools;
+
+    #[Groups(['read:Game:User'])]
+    private $userGameScore;
+
+    #[Groups(['read:Game:User'])]
+    private $partner;
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    #[Groups(['read:Game:User'])]
+    private $rules;
 
     public function __construct()
     {
@@ -168,36 +195,45 @@ class Games
 
     public function getName(): ?string
     {
-        return $this->Name;
+        return $this->name;
     }
 
-    public function setName(string $Name): self
+    public function setName(string $name): self
     {
-        $this->Name = $Name;
+        $this->name = $name;
 
         return $this;
     }
 
     public function getDestination(): ?string
     {
-        return $this->Destination;
+        return $this->destination;
     }
 
-    public function setDestination(?string $Destination): self
+    public function setDestination(?string $destination): self
     {
-        $this->Destination = $Destination;
+        $this->destination = $destination;
 
         return $this;
     }
 
     public function getCoverPath(): ?string
     {
-        return $this->CoverPath;
+        return $this->coverPath;
     }
 
-    public function setCoverPath(?string $CoverPath): self
+    public function getCoverUrl()
     {
-        $this->CoverPath = $CoverPath;
+        if (!empty($this->getCoverPath())) {
+            $this->coverUrl = 'api/games/' . $this->getId() . '/cover';
+            return $this->coverUrl;
+        }
+        return null;
+    }
+
+    public function setCoverPath(?string $coverPath): self
+    {
+        $this->coverPath = $coverPath;
 
         return $this;
     }
@@ -255,6 +291,53 @@ class Games
         if ($this->bagTools->removeElement($bagTool)) {
             $bagTool->removeGame($this);
         }
+
+        return $this;
+    }
+
+    
+
+    /**
+     * Get the value of userGameScore
+     */ 
+    public function getUserGameScore()
+    {
+        return $this->userGameScore;
+    }
+
+    /**
+     * Set the value of userGameScore
+     *
+     * @return  self
+     */ 
+    public function setUserGameScore($userGameScore)
+    {
+        $this->userGameScore = $userGameScore;
+
+        return $this;
+    }
+
+   
+    public function getPartner()
+    {
+        return $this->partner;
+    }
+
+    public function setPartner($partner)
+    {
+        $this->partner = $partner;
+
+        return $this;
+    }
+
+    public function getRules(): ?string
+    {
+        return $this->rules;
+    }
+
+    public function setRules(?string $rules): self
+    {
+        $this->rules = $rules;
 
         return $this;
     }

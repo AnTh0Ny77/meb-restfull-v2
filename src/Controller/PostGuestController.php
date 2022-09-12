@@ -11,6 +11,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Http\LoginLink\LoginLinkHandlerInterface;
 use App\Repository\UserRepository;
 use App\Entity\User;
+use App\Repository\RankRepository;
 use DateTime;
 
 class PostGuestController extends AbstractController
@@ -33,7 +34,7 @@ class PostGuestController extends AbstractController
         return implode($pass); 
     }
 
-    public function __invoke(Request $request , ValidatorInterface $validator ,UserPasswordHasherInterface $hasher , LoginLinkHandlerInterface $loginLinkHandler){
+    public function __invoke(Request $request , RankRepository $rankRepository , ValidatorInterface $validator ,UserPasswordHasherInterface $hasher , LoginLinkHandlerInterface $loginLinkHandler){
       
         
             $user = new User;
@@ -61,6 +62,9 @@ class PostGuestController extends AbstractController
                     $plain_pass = $this->randomPassword();
                     $pass = $hasher->hashPassword($user, $plain_pass);
                     $user->setPassword($pass);
+                  
+                    $Rank = $rankRepository->findOneBy(['id' => 1 ]);
+                    $user->setRank($Rank);
                     $this->em->persist($user);
                     $this->em->flush();
                 

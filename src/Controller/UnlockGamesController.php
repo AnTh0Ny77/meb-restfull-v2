@@ -61,7 +61,7 @@ class UnlockGamesController extends AbstractController
                     }else{
                        
                         $verify = $urRep->findUnlockedr($user->getId(), $match->getIdGame()->getId());
-                        if (!empty($verify)) {
+                        if (!empty($verify) and $verify->getFinish() != 1 ) {
                             return $this->json_response('401', 'Game already unlocked');
                         }
                         $newGame = new UnlockGames();

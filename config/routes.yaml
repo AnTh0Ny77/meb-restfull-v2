@@ -9,3 +9,7 @@ kernel:
 gesdinet_jwt_refresh_token:
     path: /api/token/refresh
     controller: gesdinet.jwtrefreshtoken::refresh
+
+app_reset_password:
+    path: /reset/password
+    

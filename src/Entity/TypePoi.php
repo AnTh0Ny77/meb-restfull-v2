@@ -2,31 +2,86 @@
 
 namespace App\Entity;
 
-use App\Repository\TypePoiRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use ApiPlatform\Core\Annotation\ApiResource;
-use Doctrine\Common\Collections\Collection;
-use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\TypePoiRepository;
+use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Core\Annotation\ApiResource;
+use App\Controller\GetCoverTypePoiController;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: TypePoiRepository::class)]
+#[ApiResource(
+    collectionOperations: [
+        'get' => [
+            'pagination_enabeld' => false,
+            'path' => 'typePois/',
+            'method' => 'get',
+            'normalization_context' => ['groups' => 'read:TypePoi'],
+            'security' => 'is_granted("ROLE_USER")',
+            'openapi_context' => [
+                'summary' => 'public - retrieves a TypePoi collection  ',
+                'security' => [['bearerAuth' => []]]
+            ]
+        ]
+    ],
+    itemOperations: [
+        'get' => [
+            'pagination_enabeld' => false,
+            'method' => 'get',
+            'path' => 'typePois/{id}',
+            'normalization_context' => ['groups' => 'read:TypePoi'],
+            'security' => 'is_granted("ROLE_USER")',
+            'openapi_context' => [
+                'summary' => 'public - retrieves a single TypePoi   ',
+                'security' => [['bearerAuth' => []]]
+            ]
+        ] ,'getCover' => [
+            'pagination_enabeld' => false,
+            'method' => 'get',
+            'path' => '/typePois/{id}/cover',
+            'read' => true,
+            'normalization_context' => ['groups' => 'read:TypePoi'],
+            'controller' => GetCoverTypePoiController::class,
+            'openapi_context' => [
+                'summary' => 'retrieves the cover of the type Poi ',
+                "responses" => [
+                    "200" => [
+                        "description" => "file",
+                        "content" => [
+                            "text/plain" => [
+                                "schema" =>  []
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ]
+    ]
+)]
 class TypePoi
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(['read:Poi', 'read:Game' , 'read:TypePoi'])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(['read:Poi'])]
-    private $Name;
+    #[Groups(['read:Poi' , 'read:Game' , 'read:TypePoi' ])]
+    private $name;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
-    #[Groups(['read:Poi'])]
-    private $Color;
+    #[Groups(['read:Poi', 'read:Game' , 'read:TypePoi' ])]
+    private $color;
 
     #[ORM\OneToMany(mappedBy: 'typePoi', targetEntity: Poi::class)]
     private $Poi;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $coverPath;
+
+    private $coverUrl;
 
     public function __construct()
     {
@@ -40,24 +95,24 @@ class TypePoi
 
     public function getName(): ?string
     {
-        return $this->Name;
+        return $this->name;
     }
 
-    public function setName(string $Name): self
+    public function setName(string $name): self
     {
-        $this->Name = $Name;
+        $this->name = $name;
 
         return $this;
     }
 
     public function getColor(): ?string
     {
-        return $this->Color;
+        return $this->color;
     }
 
-    public function setColor(?string $Color): self
+    public function setColor(?string $color): self
     {
-        $this->Color = $Color;
+        $this->color = $color;
 
         return $this;
     }
@@ -88,6 +143,43 @@ class TypePoi
                 $poi->setTypePoi(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCoverPath(): ?string
+    {
+        return $this->coverPath;
+    }
+
+    public function setCoverPath(?string $coverPath): self
+    {
+        $this->coverPath = $coverPath;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of coverUrl
+     */ 
+   
+    public function getCoverUrl()
+    {
+        if (!empty($this->getCoverPath())) {
+            $this->coverUrl = 'api/typePois/' . $this->getId() . '/cover';
+            return $this->coverUrl;
+        }
+    }
+    
+
+    /**
+     * Set the value of coverUrl
+     *
+     * @return  self
+     */ 
+    public function setCoverUrl($coverUrl)
+    {
+        $this->coverUrl = $coverUrl;
 
         return $this;
     }

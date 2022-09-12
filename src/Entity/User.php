@@ -2,17 +2,24 @@
 
 namespace App\Entity;
 
+use App\Entity\GameScore;
 use App\Controller\MeController;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\RankRepository;
 use App\Repository\UserRepository;
 use App\Controller\PutUserController;
 use App\Controller\GetCoverController;
 use App\Controller\CoverUserController;
+use App\Controller\GetClientController;
 use App\Controller\PostGuestController;
+use App\Controller\DeleteUserController;
 use App\Controller\ConfirmGuestController;
+use App\Controller\GetScoreControllerClass;
+use App\Controller\ResetPasswordController;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Controller\UpdatePasswordController;
+use phpDocumentor\Reflection\Types\Nullable;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\HttpFoundation\File\File;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -37,7 +44,70 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
                 'openapi_context' => [
                     'security' => [['bearerAuth' => []]]
                 ]
+                ],
+            'getScore' => [
+                'pagination_enabeld' => false,
+                'path' => 'user/scores',
+                'method' => 'get',
+                'controller' => GetScoreControllerClass::class,
+                'read' => false,
             ], 
+            'ResetPassword' => [
+                'pagination_enabeld' => false,
+                'path' => 'user/reset/password',
+                'method' => 'post',
+                'controller' => ResetPasswordController::class,
+                'normalization_context' => ['groups' => 'read:User'],
+                'read' => false,
+            'openapi_context' => [
+                'summary'     => 'Send a recovery link to the user',
+                'description' => '',
+                'requestBody' => [
+                    'content' => [
+                        'application/json' => [
+                            'schema'  => [
+                                'type'       => 'object',
+                                'properties' =>[
+                                    'email'  => ['type' => 'string']
+                                ],
+                            ],
+                            'example' => [
+                                'email'        => 'johndoe@yahoo.fr'
+                            ]
+                        ],
+                    ],
+                ],
+                "responses" => [
+                    "200" => [
+                        "description" => "user has been updated",
+                        "content" => [
+                            "application/json" => [
+                                "schema" =>  [
+                                    "properties" => [
+                                        "message" => [
+                                            "type" => "string"
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ], "201" => [
+                        "description" => "user has been updated",
+                        "content" => [
+                            "application/json" => [
+                                "schema" =>  [
+                                    "properties" => [
+                                        "message" => [
+                                            "type" => "string"
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+            ],
             'postGuest' => [
                 'pagination_enabeld' => false,
                 'path' => 'user/guest',
@@ -262,7 +332,48 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
                             ],
                         ]
                 ],
+            ], 'poiScore' => [
+                'pagination_enabeld' => false,
+                'path' => 'user/{id}/poi/score',
+                'deserialize' => true,
+                'read' =>  true ,
+                'method' => 'get',
+                'normalization_context' => ['groups' => 'read:Poi:User'],
+                'openapi_context' => [
+                    'security' => [['bearerAuth' => []]]
+                ]
+            ], 'QuestScore' => [
+                'pagination_enabeld' => false,
+                'path' => 'user/{id}/quest/score',
+                'deserialize' => true,
+                'read' =>  true,
+                'method' => 'get',
+                'normalization_context' => ['groups' => 'read:Quest:User'],
+                'openapi_context' => [
+                    'security' => [['bearerAuth' => []]]
+                ]
+        ], 'DeleteUser' => [
+            'pagination_enabeld' => false,
+            'path' => 'user/{id}/delete',
+            'controller' => DeleteUserController::class,
+            'read' =>  true,
+            'method' => 'delete',
+            'openapi_context' => [
+                'security' => [['bearerAuth' => []]]
+            ]
+        ], 'getClient' => [
+            'pagination_enabeld' => false,
+            'method' => 'get',
+            'path' => '/user/{id}/client',
+            'controller' => GetClientController::class,
+            'security' => 'is_granted("ROLE_CLIENT")',
+            'openapi_context' => [
+                'security' =>
+                [['bearerAuth' => []]],
+                'summary' => 'Client - retrieves a client data ( need a client role )',
             ],
+            'normalization_context' => ['groups' => ['read:Client:User']]
+        ],
             'updatePassword' =>[
                 'pagination_enabeld' => false,
                 'deserialize' => false,
@@ -270,7 +381,6 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
                 'method' => 'PUT',
                 'controller' => UpdatePasswordController::class,
                 'openapi_context' => [
-                    'security' => [['bearerAuth' => []]],
                     'summary' => 'Update the user password',
                     'requestBody' => [
                         'content' => [
@@ -334,7 +444,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['read:User'])]
+    #[Groups(['read:User' , 'read:Client:User'])]
     private $id;
 
     /**
@@ -343,11 +453,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
     * )
     */
     #[ORM\Column(type: 'string', length: 180, unique: true , nullable: true)]
-    #[Groups(['read:User'])]
+    #[Groups(['read:User' , 'read:Client:User'])]
     private $email;
 
     #[ORM\Column(type: 'json')]
-    #[Groups(['read:User'])]
+    #[Groups(['read:User' , 'read:Client:User'])]
     private $roles = [];
 
     #[ORM\Column(type: 'string' , nullable: true)]
@@ -363,14 +473,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
     * @Assert\NotBlank
     */
     #[ORM\Column(type: 'string', length: 255 , unique: true)]
-    #[Groups(['read:User'])]
+    #[Groups(['read:User' , 'read:Client:User'])]
     public $username;
 
     #[ORM\Column(type: 'datetime')]
     private $createdAt;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
-    #[Groups(['read:User'])]
+    #[Groups(['read:User' , 'read:Client:User'])]
     private $updatedAt;
 
     #[ORM\Column(type: 'boolean' )]
@@ -386,7 +496,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
      * )
      */
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
-    #[Groups(['read:User'])]
+    #[Groups(['read:User' , 'read:Client:User'])]
     private $name;
 
     /**
@@ -398,7 +508,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
      * )
      */
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
-    #[Groups(['read:User'])]
+    #[Groups(['read:User' , 'read:Client:User'])]
     private $firstName;
 
     /**
@@ -412,27 +522,74 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
     private $PlainPassword;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(['read:User'])]
-    private $CoverPath;
+    #[Groups(['read:User', 'read:Client:User'])]
+    private $coverPath;
 
     /**
      * @var File|null
      * @Assert\File(
-     *     maxSize = "2048k",
+     *     maxSize = "64M",
      *     mimeTypes = {"image/jpeg", "image/png"},
-     *     mimeTypesMessage = "Please upload a valid cover image: jpeg or png under 2048k")
-     * @Vich\UploadableField(mapping="user_cover", fileNameProperty="CoverPath")
+     *     mimeTypesMessage = "Please upload a valid cover image: jpeg or png under 64M")
+     * @Vich\UploadableField(mapping="user_cover", fileNameProperty="coverPath")
      */
+    
     private $file;
 
     #[ORM\OneToMany(mappedBy: 'User', targetEntity: Score::class)]
     private $scores;
 
+    #[ORM\OneToMany(mappedBy: 'userId', targetEntity: QuestScore::class)]
+    #[Groups(['read:Quest:User'])]
+    private $questScores;
+
+    #[ORM\OneToMany(mappedBy: 'User', targetEntity: PoiScore::class)]
+    #[Groups(['read:Poi:User'])]
+    private $poiScores;
+
+    
+
+    #[ORM\ManyToOne(targetEntity: Rank::class, inversedBy: 'User')]
+    #[Groups(['read:User'])]
+    private $rank;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['read:User' , 'read:Client:User'])]
+    private $phone;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: GameScore::class, orphanRemoval: true)]
+    private $GameScore;
+
+    #[ORM\Column(type: 'json', nullable: true)]
+    private $location = [];
+
+
+    #[ORM\OneToMany(mappedBy: 'User', targetEntity: ClientGames::class)]
+    #[Groups(['read:Client:User'])]
+    private $clientGames;
+
+    #[ORM\Column(type: 'boolean')]
+    #[Groups(['read:Client:User'])]
+    private $clientInfiniteQr;
+
+    #[ORM\Column(type: 'float', nullable: true)]
+    #[Groups(['read:Client:User'])]
+    private $exploreCoin;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    #[Groups(['read:Client:User'])]
+    private $bagNumber;
+
     public function __construct()
     {
+        
         $this->createdAt = new \DateTime("now");
         $this->secret = new ArrayCollection();
         $this->scores = new ArrayCollection();
+        $this->questScores = new ArrayCollection();
+        $this->poiScores = new ArrayCollection();
+        $this->Game = new ArrayCollection();
+        $this->clientGames = new ArrayCollection();
     }
 
 
@@ -460,6 +617,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
 
         return $this;
     }
+
+    
 
     /**
      * A visual identifier that represents this user.
@@ -606,12 +765,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
 
     public function getCoverPath(): ?string
     {
-        return $this->CoverPath;
+        return $this->coverPath;
     }
 
-    public function setCoverPath(?string $CoverPath): self
+    public function setCoverPath(?string $coverPath): self
     {
-        $this->CoverPath = $CoverPath;
+        $this->coverPath = $coverPath;
 
         return $this;
     }
@@ -670,4 +829,270 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
 
         return $this;
     }
+
+    /**
+     * @return Collection<int, QuestScore>
+     */
+    public function getQuestScores(): Collection
+    {
+        return $this->questScores;
+    }
+
+    public function addQuestScore(QuestScore $questScore): self
+    {
+        if (!$this->questScores->contains($questScore)) {
+            $this->questScores[] = $questScore;
+            $questScore->setUserId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeQuestScore(QuestScore $questScore): self
+    {
+        if ($this->questScores->removeElement($questScore)) {
+            // set the owning side to null (unless already changed)
+            if ($questScore->getUserId() === $this) {
+                $questScore->setUserId(null);
+            }
+        }
+
+        return $this;
+    }
+
+    private $forgotPasswordToken;
+
+    private $forgotPasswordTokenRequestedAt;
+    
+    private $forgotPasswordTokenMustBeVerifiedBefore;
+
+
+
+    /**
+     * Get the value of forgotPasswordToken
+     */ 
+    public function getForgotPasswordToken()
+    {
+        return $this->forgotPasswordToken;
+    }
+
+    /**
+     * Set the value of forgotPasswordToken
+     *
+     * @return  self
+     */ 
+    public function setForgotPasswordToken($forgotPasswordToken)
+    {
+        $this->forgotPasswordToken = $forgotPasswordToken;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of forgotPasswordTokenRequestedAt
+     */ 
+    public function getForgotPasswordTokenRequestedAt()
+    {
+        return $this->forgotPasswordTokenRequestedAt;
+    }
+
+    /**
+     * Set the value of forgotPasswordTokenRequestedAt
+     *
+     * @return  self
+     */ 
+    public function setForgotPasswordTokenRequestedAt($forgotPasswordTokenRequestedAt)
+    {
+        $this->forgotPasswordTokenRequestedAt = $forgotPasswordTokenRequestedAt;
+
+        return $this;
+    }
+
+   
+
+   
+
+    /**
+     * Get the value of forgotPasswordTokenMustBeVerifiedBefore
+     */ 
+    public function getForgotPasswordTokenMustBeVerifiedBefore()
+    {
+        return $this->forgotPasswordTokenMustBeVerifiedBefore;
+    }
+
+    /**
+     * Set the value of forgotPasswordTokenMustBeVerifiedBefore
+     *
+     * @return  self
+     */ 
+    public function setForgotPasswordTokenMustBeVerifiedBefore($forgotPasswordTokenMustBeVerifiedBefore)
+    {
+        $this->forgotPasswordTokenMustBeVerifiedBefore = $forgotPasswordTokenMustBeVerifiedBefore;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, PoiScore>
+     */
+    public function getPoiScores(): Collection
+    {
+        return $this->poiScores;
+    }
+
+    public function addPoiScore(PoiScore $poiScore): self
+    {
+        if (!$this->poiScores->contains($poiScore)) {
+            $this->poiScores[] = $poiScore;
+            $poiScore->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removePoiScore(PoiScore $poiScore): self
+    {
+        if ($this->poiScores->removeElement($poiScore)) {
+            // set the owning side to null (unless already changed)
+            if ($poiScore->getUser() === $this) {
+                $poiScore->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getRank(): ?Rank
+    {
+        return $this->rank;
+    }
+
+    public function setRank(?Rank $rank): self
+    {
+        $this->rank = $rank;
+
+        return $this;
+    }
+
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(?string $phone): self
+    {
+        $this->phone = $phone;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, GameScore>
+     */
+    public function getGame(): Collection
+    {
+        return $this->GameScore;
+    }
+
+    public function addGame(GameScore $GameScore): self
+    {
+        if (!$this->GameScore->contains($GameScore)) {
+            $this->GameScore[] = $GameScore;
+            $GameScore->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGame(GameScore $GameScore): self
+    {
+        if ($this->GameScore->removeElement($GameScore)) {
+            // set the owning side to null (unless already changed)
+            if ($GameScore->getUser() === $this) {
+                $GameScore->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getLocation(): ?array
+    {
+        return $this->location;
+    }
+
+    public function setLocation(?array $location): self
+    {
+        $this->location = $location;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ClientGames>
+     */
+    public function getClientGames(): Collection
+    {
+        return $this->clientGames;
+    }
+
+    public function addClientGame(ClientGames $clientGame): self
+    {
+        if (!$this->clientGames->contains($clientGame)) {
+            $this->clientGames[] = $clientGame;
+            $clientGame->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeClientGame(ClientGames $clientGame): self
+    {
+        if ($this->clientGames->removeElement($clientGame)) {
+            // set the owning side to null (unless already changed)
+            if ($clientGame->getUser() === $this) {
+                $clientGame->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getClientInfiniteQr(): ?bool
+    {
+        return $this->clientInfiniteQr;
+    }
+
+    public function setClientInfiniteQr(bool $clientInfiniteQr): self
+    {
+        $this->clientInfiniteQr = $clientInfiniteQr;
+
+        return $this;
+    }
+
+    public function getExploreCoin(): ?float
+    {
+        return $this->exploreCoin;
+    }
+
+    public function setExploreCoin(?float $exploreCoin): self
+    {
+        $this->exploreCoin = $exploreCoin;
+
+        return $this;
+    }
+
+    public function getBagNumber(): ?int
+    {
+        return $this->bagNumber;
+    }
+
+    public function setBagNumber(?int $bagNumber): self
+    {
+        $this->bagNumber = $bagNumber;
+
+        return $this;
+    }
+
+    
 }

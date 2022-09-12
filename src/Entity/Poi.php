@@ -13,9 +13,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 #[ORM\Entity(repositoryClass: PoiRepository::class)]
-#[ApiFilter(SearchFilter::class, properties: ['Quest' => 'exact'])]
+#[ApiFilter(SearchFilter::class, properties: ['quest' => 'exact'])]
 #[ApiResource(
-    order: ["Step" => "ASC"],
+    order: ["step" => "ASC"],
     collectionOperations: [
         'get' => [
             'pagination_enabeld' => false,
@@ -32,11 +32,12 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
             'method' => 'get',
             'normalization_context' => ['groups' => 'read:Poi'],
             'openapi_context' => [
+                'security' => [['bearerAuth' => []]],
                 'summary' => 'public - retrieves a single Poi ',
             ]
         ], 'getClue' => [
             'pagination_enabeld' => false,
-            'path' => '/Poi/{id}/Clue',
+            'path' => '/poi/{id}/clue',
             'method' => 'get',
             'normalization_context' => ['groups' => 'read:Clue'],
             'openapi_context' => [
@@ -45,7 +46,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
             ]
         ],'getImageClue' => [
             'pagination_enabeld' => false,
-            'path' => '/Poi/{id}/ImageClue',
+            'path' => '/poi/{id}/imageClue',
             'controller' => GetImageClueController::class,
             'read' => true,
             'method' => 'get',
@@ -71,43 +72,77 @@ class Poi
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['read:Quest', 'read:oneQuest' , 'read:Poi' , 'read:Game'])]
+    #[Groups(['read:Quest', 'read:oneQuest' , 'read:Poi' , 'read:Game' ,'read:Poi:User' , 'read:Game:User'])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 100)]
-    #[Groups(['read:Quest', 'read:oneQuest', 'read:Poi' , 'read:Clue' , 'read:Game'])]
-    private $Name;
+    #[Groups(['read:Quest', 'read:oneQuest', 'read:Poi' , 'read:Clue' , 'read:Game' , 'read:Game:User'])]
+    private $name;
 
     #[ORM\Column(type: 'json')]
-    #[Groups(['read:Quest', 'read:oneQuest', 'read:Poi' , 'read:Game'])]
-    private $Latlng = [];
+    private $latlng = [];
+
+    #[Groups(['read:Quest', 'read:oneQuest', 'read:Poi', 'read:Game' , 'read:Game:User'])]
+    private $lat;
+
+    #[Groups(['read:Quest', 'read:oneQuest', 'read:Poi', 'read:Game' , 'read:Game:User'])]
+    private $lng;
 
     #[ORM\ManyToOne(targetEntity: Quest::class, inversedBy: 'poi')]
-    #[Groups(['read:Poi'])]
-    private $Quest;
+    #[Groups(['read:Poi' ])]
+    private $quest;
 
     #[ORM\Column(type: 'text', nullable: true)]
-    #[Groups(['read:Poi' , 'read:Game'])]
-    private $Text;
+    #[Groups(['read:Poi' , 'read:Game' , 'read:Game:User'])]
+    private $text;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(['read:Clue' , 'read:Game'])]
+    #[Groups(['read:Clue' , 'read:Game' , 'read:Game:User'])]
     private $clue;
 
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
     private $ImageClue;
 
     #[ORM\Column(type: 'smallint', nullable: true)]
-    #[Groups(['read:Quest', 'read:oneQuest', 'read:Poi' , 'read:Game'])]
-    private $Step;
+    #[Groups(['read:Quest', 'read:oneQuest', 'read:Poi' , 'read:Game' , 'read:Game:User'])]
+    private $step;
 
     #[ORM\ManyToOne(targetEntity: TypePoi::class, inversedBy: 'Poi')]
-    #[Groups(['read:Poi' , 'read:Game'])]
     private $typePoi;
 
-    #[ORM\OneToMany(mappedBy: 'Poi', targetEntity: Slide::class)]
-    #[Groups([ 'read:Game'])]
+    #[Groups(['read:Poi', 'read:Game' , 'read:Game:User'])]
+    private $typePoiId;
+
+    #[Groups(['read:Game:User'])]
+    private $typePoiName;
+
+    #[Groups(['read:Game:User'])]
+    private $typePoiColor;
+
+    #[Groups(['read:Game:User'])]
+    private $typePoiCoverUrl;
+
+    #[ORM\OneToMany(mappedBy: 'poi', targetEntity: Slide::class)]
+    #[Groups([ 'read:Game' , 'read:Poi' , 'read:Game:User'])]
     private $slides;
+
+    #[ORM\Column(type: 'smallint', nullable: true)]
+    #[Groups(['read:Quest', 'read:oneQuest', 'read:Poi', 'read:Game' , 'read:Game:User' ])]
+    private $radius;
+
+    #[Groups(['read:Game:User'])]
+    private $userPoiScore;
+
+    #[Groups(['read:Game:User'])]
+    private $userPoiFinished;
+
+    #[Groups([ 'read:Game:User'])]
+    private $clueCoverUrl;
+
+    #[Groups(['read:Game:User'])]
+    private $clueText;
+
+  
 
     public function __construct()
     {
@@ -122,48 +157,65 @@ class Poi
 
     public function getName(): ?string
     {
-        return $this->Name;
+        return $this->name;
     }
 
-    public function setName(string $Name): self
+    public function setName(string $name): self
     {
-        $this->Name = $Name;
+        $this->name = $name;
 
         return $this;
     }
 
+    
     public function getLatlng(): ?array
     {
-        return $this->Latlng;
+        return $this->latlng;
     }
 
-    public function setLatlng(array $Latlng): self
+    
+    public function getLat()
     {
-        $this->Latlng = $Latlng;
+        $array = $this->getLatlng();
+        $this->lat = $array['lat'];
+        return $this->lat;
+    }
+
+   
+    public function getLng()
+    {
+        $array = $this->getLatlng();
+        $this->lng = $array['lng'];
+        return $this->lng;
+    }
+
+    public function setLatlng(array $latlng): self
+    {
+        $this->latlng = $latlng;
 
         return $this;
     }
 
     public function getQuest(): ?Quest
     {
-        return $this->Quest;
+        return $this->quest;
     }
 
-    public function setQuest(?Quest $Quest): self
+    public function setQuest(?Quest $quest): self
     {
-        $this->Quest = $Quest;
+        $this->quest = $quest;
 
         return $this;
     }
 
     public function getText(): ?string
     {
-        return $this->Text;
+        return $this->text;
     }
 
-    public function setText(?string $Text): self
+    public function setText(?string $text): self
     {
-        $this->Text = $Text;
+        $this->text = $text;
 
         return $this;
     }
@@ -194,12 +246,12 @@ class Poi
 
     public function getStep(): ?int
     {
-        return $this->Step;
+        return $this->step;
     }
 
-    public function setStep(?int $Step): self
+    public function setStep(?int $step): self
     {
-        $this->Step = $Step;
+        $this->step = $step;
 
         return $this;
     }
@@ -207,6 +259,12 @@ class Poi
     public function getTypePoi(): ?TypePoi
     {
         return $this->typePoi;
+    }
+
+    public function getTypePoiId()
+    {
+        $this->typePoiId = $this->getTypePoi()->getId();
+        return $this->typePoiId;
     }
 
     public function setTypePoi(?TypePoi $typePoi): self
@@ -246,5 +304,159 @@ class Poi
         return $this;
     }
 
-  
+    public function getRadius(): ?int
+    {
+        return $this->radius;
+    }
+
+    public function setRadius(?int $Radius): self
+    {
+        $this->radius = $Radius;
+
+        return $this;
+    }
+
+   
+
+    /**
+     * Get the value of userPoiScore
+     */ 
+    public function getUserPoiScore()
+    {
+        if (empty($this->userPoiScore)) {
+            $this->userPoiScore = 0;
+        }
+        
+        return $this->userPoiScore;
+    }
+
+    /**
+     * Set the value of userPoiScore
+     *
+     * @return  self
+     */ 
+    public function setUserPoiScore($userPoiScore)
+    {
+        $this->userPoiScore = $userPoiScore;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of userPoiFinsihed
+     */ 
+    public function getUserPoiFinished()
+    {
+        if (empty($this->userPoiFinished)) {
+            $this->userPoiFinished = false;
+        }
+        return $this->userPoiFinished;
+    }
+
+    /**
+     * Set the value of userPoiFinsihed
+     *
+     * @return  self
+     */ 
+    public function setUserPoiFinished($userPoiFinsihed)
+    {
+        $this->userPoiFinished = $userPoiFinsihed;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of typePoiName
+     */ 
+    public function getTypePoiName()
+    {
+        $this->typePoiName = $this->getTypePoi()->getName();
+        return $this->typePoiName;
+    }
+
+    /**
+     * Get the value of typePoiColor
+     */ 
+    public function getTypePoiColor()
+    {
+        $this->typePoiColor = $this->getTypePoi()->getColor();
+        return $this->typePoiColor;
+    }
+
+    /**
+     * Set the value of typePoiName
+     *
+     * @return  self
+     */ 
+    public function setTypePoiName($typePoiName)
+    {
+        $this->typePoiName = $typePoiName;
+
+        return $this;
+    }
+
+    /**
+     * Set the value of typePoiCoverUrl
+     *
+     * @return  self
+     */ 
+    public function setTypePoiCoverUrl($typePoiCoverUrl)
+    {
+        $this->typePoiCoverUrl = $typePoiCoverUrl;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of typePoiCoverUrl
+     */ 
+    public function getTypePoiCoverUrl()
+    {
+        $this->typePoiCoverUrl = $this->getTypePoi()->getCoverUrl();
+        return $this->typePoiCoverUrl;
+    }
+
+
+    /**
+     * Get the value of clueUrl
+     */ 
+    public function getClueUrl()
+    {
+        if (!empty($this->getImageClue())) {
+            $this->clueCoverUrl = 'api/Poi/' . $this->getId() . '/imageClue';
+        }
+        return $this->clueCoverUrl;
+    }
+
+    /**
+     * Set the value of clueUrl
+     *
+     * @return  self
+     */ 
+    public function setClueUrl($clueUrl)
+    {
+        $this->clueUrl = $clueUrl;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of clueText
+     */ 
+    public function getClueText()
+    {
+        return $this->getClue();
+    }
+
+    /**
+     * Set the value of clueText
+     *
+     * @return  self
+     */ 
+    public function setClueText($clueText)
+    {
+        $this->clueText = $clueText;
+
+        return $this;
+    }
 }

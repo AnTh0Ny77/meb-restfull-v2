@@ -56,9 +56,7 @@ class GetCoverController extends AbstractController
             return $this->json_response('401', 'user not found');
         } else {
 
-            if ($user->getConfirmed() != true) {
-                return $this->json_response('400', 'user need to be confirmed , see: api/user/guest/confirm');
-            } else {
+          
                 $arrContextOptions = array(
                     "ssl" => array(
                         "verify_peer" => false,
@@ -87,7 +85,7 @@ class GetCoverController extends AbstractController
                     }else{
                         return $this->json_response('400', 'no cover for ' . $user->getUsername());
                     }     
-            }
+            
         }
     }
 }

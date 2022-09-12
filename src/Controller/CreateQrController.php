@@ -83,6 +83,7 @@ class CreateQrController extends AbstractController
                    $qr->setTime(3000);
                    $this->em->persist($qr);
                    $this->em->flush();
+                 
                    $link = '/api/UnlockGame/unlock?secret='. $key;
                    $response = [
                         "url" =>  $link,
@@ -91,11 +92,12 @@ class CreateQrController extends AbstractController
                     $baseurl = $request->getScheme() . '://' . $request->getHttpHost() . $request->getBasePath();
                     
                     $link = $baseurl . ''. $link;
-                    dd($link);
+                    
+                   
                     $result = Builder::create()
                     ->writer(new PngWriter())
                     ->writerOptions([])
-                    ->data($link)
+                    ->data($key)
                     ->encoding(new Encoding('UTF-8'))
                     ->errorCorrectionLevel(new ErrorCorrectionLevelHigh())
                     ->size(300)
@@ -108,8 +110,8 @@ class CreateQrController extends AbstractController
                     
                     $response = new QrCodeResponse($result);
                     return  $response;
-                    // $data = new JsonResponse($response, '201');
-                    // return $data;
+                    $data = new JsonResponse($response, '201');
+                    return $data;
                    
                   
             }

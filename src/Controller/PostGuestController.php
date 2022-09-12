@@ -49,6 +49,7 @@ class PostGuestController extends AbstractController
                 $date = new \DateTime("now");
                 $user->setCreatedAt($date);
                 $user->setConfirmed(0);
+                
                 $errors = $validator->validate($user);
                 if (count($errors) > 0) {
                     $errorsString = (string) $errors;

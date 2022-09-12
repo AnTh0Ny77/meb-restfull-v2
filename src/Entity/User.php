@@ -590,6 +590,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
         $this->poiScores = new ArrayCollection();
         $this->Game = new ArrayCollection();
         $this->clientGames = new ArrayCollection();
+        $this->clientInfiniteQr = 0 ;
     }
 
 

@@ -366,7 +366,6 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
             'method' => 'get',
             'path' => '/user/{id}/client',
             'controller' => GetClientController::class,
-            'security' => 'is_granted("ROLE_CLIENT")',
             'openapi_context' => [
                 'security' =>
                 [['bearerAuth' => []]],

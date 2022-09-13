@@ -37,10 +37,16 @@ class GetClientController extends AbstractController
             return $this->json_response('401', 'JWT Token  not found');
         }
 
+
         $user = $ur->findOneBy(array('username' => $user->username));
         if (!$user instanceof User) {
             return $this->json_response('401', 'user not found');
         } else {
+
+            if (!$this->security->isGranted('ROLE_CLIENT')) {
+                return $this->json_response('403', 'accès denied');
+            }
+
             $user =  $request->get('data');
             if (!$user instanceof User) {
                 return $this->json_response('404', 'not found ');

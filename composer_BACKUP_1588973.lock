@@ -4,7 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c7e394f5c118bcdcac5b1e7bfd1796b2",
+
+    "content-hash": "c0c37ddcd3edb7a1df12d533534fb05e",
     "packages": [
         {
             "name": "api-platform/core",
@@ -6975,7 +6976,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-m,,ain": "3.0-dev"
+                    "dev-main": "3.0-dev"
                 },
                 "thanks": {
                     "name": "symfony/contracts",

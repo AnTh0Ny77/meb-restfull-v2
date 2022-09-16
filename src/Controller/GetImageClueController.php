@@ -46,7 +46,7 @@ class GetImageClueController extends AbstractController
         $poi =  $request->get('data');
 
         if (!$poi instanceof Poi) {
-            return $this->json_response('400', 'Unknow game');
+            return $this->json_response('400', 'Unknow POI');
         }
         if (empty($poi->getImageClue())) {
             return $this->json_response('400', 'no image clue: ' . $poi->getName() . '');

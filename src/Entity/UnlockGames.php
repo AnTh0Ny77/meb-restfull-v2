@@ -8,6 +8,7 @@ use App\Repository\UnlockGamesRepository;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: UnlockGamesRepository::class)]
 #[ApiResource(
@@ -64,13 +65,16 @@ class UnlockGames
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(['read:Client:User'])]
     private $id;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['read:Client:User'])]
     private $idUser;
 
     #[ORM\Column(type: 'boolean')]
+    #[Groups(['read:Client:User'])]
     private $finish;
 
     #[ORM\OneToOne(targetEntity: QrCode::class, cascade: ['persist', 'remove'])]
@@ -78,6 +82,7 @@ class UnlockGames
     private $qrCode;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
+    #[Groups(['read:Client:User'])]
     private $date;
 
 

@@ -7,6 +7,7 @@ use App\Repository\QrCodeRepository;
 use App\Controller\CreateQrController;
 use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: QrCodeRepository::class)]
 #[ApiResource(
@@ -67,6 +68,7 @@ class QrCode
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(['read:Client:User'])]
     private $id;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
@@ -85,16 +87,20 @@ class QrCode
     private $secret;
 
     #[ORM\Column(type: 'boolean')]
+    #[Groups(['read:Client:User'])]
     private $qrLock;
 
     #[ORM\ManyToOne(targetEntity: Games::class)]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['read:Client:User'])]
     private $idGame;
 
     #[ORM\Column(type: 'integer', nullable: true)]
+    #[Groups(['read:Client:User'])]
     private $time;
 
     #[ORM\Column(type: 'datetime')]
+    #[Groups(['read:Client:User'])]
     private $createdAt;
 
 

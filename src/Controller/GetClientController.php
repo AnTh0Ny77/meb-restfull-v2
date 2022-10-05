@@ -51,10 +51,10 @@ class GetClientController extends AbstractController
             //     return $this->json_response('403', 'accès denied');
             // }
             $user =  $request->get('data');
-            $qrTotaux = $qr->findBy(array('id_client_id' => $user->getId()));
+            $qrTotaux = $qr->findBy(array('idClient' => $user->getId()));
             $qrCours = [];
             foreach($qrTotaux as $key => $value) {
-                $unlock = $ugr->findOneBy(array('qr_code_id' => $value->getId()));
+                $unlock = $ugr->findOneBy(array('qrCode' => $value->getId()));
                 if($unlock instanceof UnlockGames){
                     array_push($qrCours , $unlock);
                 }

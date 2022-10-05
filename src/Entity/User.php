@@ -579,6 +579,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
     #[Groups(['read:Client:User'])]
     private $bagNumber;
 
+
+    #[Groups(['read:Client:User'])]
+    private $stat;
+
     public function __construct()
     {
         
@@ -1094,5 +1098,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
         return $this;
     }
 
-    
+    public function getStat(){
+        return $this->stat;
+    }
+
+    public function setStat($stat){
+        $this->stat = $stat;
+
+        return $this;
+    }
 }

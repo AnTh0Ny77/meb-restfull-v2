@@ -64,11 +64,12 @@ class UnlockGamesController extends AbstractController
                         if (!empty($verify) and $verify->getFinish() != 1 ) {
                             return $this->json_response('401', 'Game already unlocked');
                         }
+                        $time = $match->getTime();
                         $newGame = new UnlockGames();
                         $newGame->setIdUser($user);
                         $newGame->setFinish(0);
                         $newGame->setQrCode($match);
-                        $date = new DateTime('now +24 hours');
+                        $date = new DateTime('now +'.$time.' hours');
                         $newGame->setDate($date);
                         $this->em->persist($newGame);
                         $this->em->flush();

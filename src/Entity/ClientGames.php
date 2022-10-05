@@ -24,6 +24,10 @@ class ClientGames
     #[Groups(['read:Client:User'])]
     private $Game;
 
+    #[ORM\Column(type: 'float', nullable: true)]
+    #[Groups(['read:Client:User'])]
+    private $cost;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -49,6 +53,18 @@ class ClientGames
     public function setGame(?Games $Game): self
     {
         $this->Game = $Game;
+
+        return $this;
+    }
+
+    public function getCost(): ?float
+    {
+        return $this->cost;
+    }
+
+    public function setCost(?float $cost): self
+    {
+        $this->cost = $cost;
 
         return $this;
     }

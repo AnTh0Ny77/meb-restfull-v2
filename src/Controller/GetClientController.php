@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
-
+use App\Entity\UnlockGames;
 use App\Entity\User;
+use App\Repository\QrCodeRepository;
+use App\Repository\UnlockGamesRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,7 +31,7 @@ class GetClientController extends AbstractController
         return $data;
     }
 
-    public function __invoke(UserRepository $ur , Request $request)
+    public function __invoke(UserRepository $ur , QrCodeRepository $qr , UnlockGamesRepository $ugr , Request $request)
     {
         $user = $this->security->getUser();
 
@@ -39,6 +41,8 @@ class GetClientController extends AbstractController
 
 
         $user = $ur->findOneBy(array('username' => $user->username));
+
+
         if (!$user instanceof User) {
             return $this->json_response('401', 'user not found');
         } else {
@@ -46,8 +50,23 @@ class GetClientController extends AbstractController
             // if ($this->security->isGranted('ROLE_ADMIN')) {
             //     return $this->json_response('403', 'accès denied');
             // }
-
             $user =  $request->get('data');
+            $qrTotaux = $qr->findBy(array('id_client_id' => $user->getId()));
+            $qrCours = [];
+            foreach($qrTotaux as $key => $value) {
+                $unlock = $ugr->findOneBy(array('qr_code_id' => $value->getId()));
+                if($unlock instanceof UnlockGames){
+                    array_push($qrCours , $unlock);
+                }
+            }
+
+            $stats = [
+                'qr_generate' => $qrTotaux , 
+                'Unlock_games' => $qrCours
+            ];
+
+            $user->setStat($stats);
+            
             if (!$user instanceof User) {
                 return $this->json_response('404', 'not found ');
             }else{

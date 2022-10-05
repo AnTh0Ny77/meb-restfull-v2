@@ -56,6 +56,7 @@ class CreateQrController extends AbstractController
         return implode($pass);
     }
 
+   
     public function __invoke(Request $request, GamesRepository $gr, QuestRepository $questRep, UserRepository $ur, UnlockGamesRepository $urRep)
     {
         $user = $this->security->getUser();
@@ -68,6 +69,11 @@ class CreateQrController extends AbstractController
             return $this->json_response('401', 'user not found');
         } else {
             $content = json_decode($request->getContent(), true);
+
+            if (empty($content['time'])) {
+                $time = 48 ;
+            } else $time = $content['time'];
+
             $game = $gr->findOneBy(array('id' => intval($content['game'])));
             if (!$game instanceof Games) {
                 return $this->json_response('401', 'game not found');
@@ -80,7 +86,7 @@ class CreateQrController extends AbstractController
                    $qr->setSecret($key);
                    $qr->setQrLock(0);
                    $qr->setIdGame($game);
-                   $qr->setTime(3000);
+                   $qr->setTime(intval($time));
                    $this->em->persist($qr);
                    $this->em->flush();
                  

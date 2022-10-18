@@ -18,6 +18,7 @@ use App\Controller\GetScoreControllerClass;
 use App\Controller\ResetPasswordController;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use App\Controller\ReloadExcController;
 use App\Controller\UpdatePasswordController;
 use phpDocumentor\Reflection\Types\Nullable;
 use Symfony\Component\Console\Helper\HelperSet;
@@ -372,6 +373,17 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
                 'summary' => 'Client - retrieves a client data ( need a client role )',
             ],
             'normalization_context' => ['groups' => ['read:Client:User']]
+        ], 'reloadCoin' => [
+            'pagination_enabeld' => false,
+            'method' => 'put',
+            'path' => '/user/{id}/coin',
+            'controller' => ReloadExcController::class,
+            'openapi_context' => [
+                'security' =>
+                [['bearerAuth' => []]],
+                'summary' => 'Client - retrieves a client data ( need a client role )',
+            ],
+            'normalization_context' => ['groups' => ['read:Client:User']]
         ],
             'updatePassword' =>[
                 'pagination_enabeld' => false,
@@ -594,6 +606,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
         $this->Game = new ArrayCollection();
         $this->clientGames = new ArrayCollection();
         $this->clientInfiniteQr = 0 ;
+        $this->transacs = new ArrayCollection();
     }
 
 
@@ -870,6 +883,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
     
     private $forgotPasswordTokenMustBeVerifiedBefore;
 
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Transac::class)]
+    #[Groups(['read:Client:User'])]
+    private $transacs;
+
 
 
     /**
@@ -1104,6 +1121,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
 
     public function setStat($stat){
         $this->stat = $stat;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Transac>
+     */
+    public function getTransacs(): Collection
+    {
+        return $this->transacs;
+    }
+
+    public function addTransac(Transac $transac): self
+    {
+        if (!$this->transacs->contains($transac)) {
+            $this->transacs[] = $transac;
+            $transac->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTransac(Transac $transac): self
+    {
+        if ($this->transacs->removeElement($transac)) {
+            // set the owning side to null (unless already changed)
+            if ($transac->getUser() === $this) {
+                $transac->setUser(null);
+            }
+        }
 
         return $this;
     }

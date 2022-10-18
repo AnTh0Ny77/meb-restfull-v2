@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20220930140833 extends AbstractMigration
+final class Version20221011145908 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -20,14 +20,15 @@ final class Version20220930140833 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE client_games ADD cost DOUBLE PRECISION DEFAULT NULL');
+        $this->addSql('CREATE TABLE transac (id INT AUTO_INCREMENT NOT NULL, user_id INT DEFAULT NULL, amount DOUBLE PRECISION NOT NULL, created_at DATETIME NOT NULL, INDEX IDX_42E0E54CA76ED395 (user_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('ALTER TABLE transac ADD CONSTRAINT FK_42E0E54CA76ED395 FOREIGN KEY (user_id) REFERENCES user (id)');
         $this->addSql('ALTER TABLE poi CHANGE clue clue VARCHAR(255) DEFAULT NULL');
     }
 
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE client_games DROP cost');
+        $this->addSql('DROP TABLE transac');
         $this->addSql('ALTER TABLE poi CHANGE clue clue VARCHAR(1000) DEFAULT NULL');
     }
 }

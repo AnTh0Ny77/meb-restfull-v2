@@ -47,9 +47,10 @@ class GetClientController extends AbstractController
             return $this->json_response('401', 'user not found');
         } else {
 
-            // if ($this->security->isGranted('ROLE_ADMIN')) {
-            //     return $this->json_response('403', 'accès denied');
-            // }
+            if (!in_array("ROLE_CLIENT", $user->getRoles())) {
+                return $this->json_response('401', 'User nedd to be a client ');
+            }
+           
             $user =  $request->get('data');
             $qrTotaux = $qr->findBy(array('idClient' => $user->getId()));
             $qrCours = [];

@@ -54,7 +54,7 @@ class PlayQuestController extends AbstractController
         if (!$quest instanceof Quest) 
             return $this->json_response('401', 'Slide not found');
 
-        $verify_quest = $qr->findOneBY(['questId' => $quest->getID(), 'userId' => $user->getId()]);
+        $verify_quest = $qr->findOneBy(['questId' => $quest->getID(), 'userId' => $user->getId()]);
 
         if ($verify_quest instanceof QuestScore and $verify_quest->getFinished() == 1 )
             return $this->json_response('401', 'You have already finished '.$quest->getName().'');
@@ -99,7 +99,7 @@ class PlayQuestController extends AbstractController
            
             $questscore->setUserId($user);
             $questscore->setQuestId($quest);
-            $questscore->setScore($quest_score);
+            $questscore->setScore($quest_score + 10);
             $questscore->setFinished(1);
             $this->em->persist($questscore);
             $this->em->flush();

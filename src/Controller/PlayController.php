@@ -212,8 +212,7 @@ class PlayController extends AbstractController
             if ( $slide->getTypeSlide()->getId() == 6) {
                 return $this->json_response('400', 'please use the correct request for slide type: '. $slide->getTypeSlide()->getName().'');
             }
-           
-           
+            
             switch (intval($slide->getTypeSlide()->getId())) {
                 case 1:
                 case 3:
@@ -259,12 +258,7 @@ class PlayController extends AbstractController
                         $score->setSlide($slide);
                         $message = $slide->getTextFail();
                         $score->setUser($user);
-                        if ($slide->getPenality()) {
-                            $score->setPoint(-1);
-                        }else{
-                            $score->setPoint(0);
-                        }
-                        
+                        $score->setPoint(0);
                         $score->setValue($answer->answer);
                    }
                     $this->em->persist($score);
@@ -315,12 +309,7 @@ class PlayController extends AbstractController
                         $score->setSlide($slide);
                         $message = $slide->getTextFail();
                         $score->setUser($user);
-                        if ($slide->getPenality()) {
-                            $score->setPoint(-1);
-                        } else {
-                            $score->setPoint(0);
-                        }
-
+                        $score->setPoint(0);
                         $score->setValue('auto value');
                     }
                     $this->em->persist($score);
@@ -360,12 +349,7 @@ class PlayController extends AbstractController
                         $score->setSlide($slide);
                         $message = $slide->getTextFail();
                         $score->setUser($user);
-                        if ($slide->getPenality()) {
-                            $score->setPoint(-1);
-                        } else {
-                            $score->setPoint(0);
-                        }
-
+                        $score->setPoint(0);
                         $score->setValue($answer->answer);
                     }
                     $this->em->persist($score);

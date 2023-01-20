@@ -55,9 +55,12 @@ class GetQCMPController extends AbstractController
             if (intval($index) == intval($key)) {
                 
                 $bool = true;
-                $path = substr($image, 1);
             
-                if ($filesystem->exists($path)) {
+                if (file_exists('../public/images/qcmp/'.$slide->getId().'/' . $image)) {
+                    $path = '../public/images/qcmp/'.$slide->getId().'/' . $image;
+                }
+            
+                if (file_exists($path)) {
                     $mime = finfo_file(finfo_open(FILEINFO_MIME_TYPE), $path);
                     $response = new Response();
                     $disposition = $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_INLINE, basename($path));

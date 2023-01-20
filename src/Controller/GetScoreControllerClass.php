@@ -52,11 +52,16 @@ class GetScoreControllerClass extends AbstractController
           foreach($score_for_user as $score) {
                 $user_total += $score->getScore();
           }
-        $results[$value->getUsername()] = $user_total;
+		  if($user_total > 0){
+			  $results[$value->getUsername()] = $user_total;
+		  }
+      
       }
-      array_multisort($results,SORT_NUMERIC, SORT_DESC);
-      $data = new JsonResponse($results, '200');
-      return $data;  
-        
+   
+    uasort($results, function ($a, $b) {
+    return $b <=> $a;
+    });
+    $data = new JsonResponse($results, '200');
+    return $data;    
     }
 }

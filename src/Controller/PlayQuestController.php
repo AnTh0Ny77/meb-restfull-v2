@@ -7,9 +7,11 @@ use App\Entity\Quest;
 use App\Entity\Score;
 use App\Entity\Slide;
 use App\Entity\QrCode;
+use App\Entity\GameScore;
 use App\Entity\QuestScore;
 use App\Entity\UnlockGames;
 use App\Repository\UserRepository;
+use App\Repository\GameScoreRepository;
 use App\Repository\GamesRepository;
 use App\Repository\QuestRepository;
 use App\Repository\QrCodeRepository;
@@ -38,8 +40,37 @@ class PlayQuestController extends AbstractController
         return $data;
     }
 
-    public function __invoke(Request $request, QuestScoreRepository $qr , ScoreRepository $sr , GamesRepository $gr, QuestRepository $questRep, UserRepository $ur, UnlockGamesRepository $urRep, UploaderHelper $helper)
+
+     public function set_game_score(Games $game ,User $user , GameScoreRepository $gr , QuestScoreRepository $qsr ){
+       
+        $questArray = $game->getQuests();
+        $score = 0 ;
+        foreach ($questArray as $quest) {
+            if ($quest instanceof Quest) {
+                $questScore = $qsr->findOneBy(['questId' => $quest->getID(), 'userId' => $user->getId()]);
+                if ($questScore instanceof QuestScore) {
+                    $score += $questScore->getScore();
+                }
+            }
+        }
+        $gameScore = $gr->findOneBy(['game' => $game->getID(), 'user' => $user->getId()]);
+        if ($gameScore instanceof GameScore) {
+            $gameScore->setScore($score);
+        }else{
+            $gameScore = new GameScore();
+            $gameScore->setScore($score);
+            $gameScore->setUser($user);
+            $gameScore->setGame($game);
+        }
+            $this->em->persist($gameScore);
+            $this->em->flush();
+    }
+
+    public function __invoke(Request $request, QuestScoreRepository $qr ,  GameScoreRepository $grsp , 
+    ScoreRepository $sr , GamesRepository $gr, QuestRepository $questRep, 
+    UserRepository $ur, UnlockGamesRepository $urRep, UploaderHelper $helper)
     {
+    
         $user = $this->security->getUser();
         if (empty($user))
             return $this->json_response('401', 'JWT Token  not found');
@@ -75,6 +106,7 @@ class PlayQuestController extends AbstractController
             if (empty($array_poi))
                 return $this->json_response('400', 'No POI for this quest');
             
+           
             $quest_score = 0 ;
             foreach ($array_poi as $poi){
                 $array_slide = $poi->getSlides();
@@ -97,12 +129,19 @@ class PlayQuestController extends AbstractController
                 $questscore = new QuestScore();
             } else $questscore = $verify_quest;
            
+           
             $questscore->setUserId($user);
             $questscore->setQuestId($quest);
             $questscore->setScore($quest_score + 10);
+           
             $questscore->setFinished(1);
+          
             $this->em->persist($questscore);
             $this->em->flush();
+           
+            $game = $gr->findOneBy(['id' => $quest->getGame()->getId()]);
+            
+            $this->set_game_score($game, $user, $grsp, $qr );
             $response = [
                 "message" => 'Congratulations '.$quest->getName().' finished',
                 "score" => $quest_score

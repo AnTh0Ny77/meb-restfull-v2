@@ -35,7 +35,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
                 'pagination_enabeld' => false,
                 'path' => '/quest/{id}/play',
                 'controller' => PlayQuestController::class,
-                'deserialize' => false,
+                'deserialize' => true,
                 'method' => 'post',
                 'security' => 'is_granted("ROLE_USER")',
                 'openapi_context' => [

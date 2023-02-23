@@ -8,6 +8,7 @@ use App\Entity\UnlockGames;
 use App\Repository\UserRepository;
 use App\Repository\GamesRepository;
 use App\Repository\QuestRepository;
+use App\Repository\GameScoreRepository;
 use Symfony\Component\Mime\Address;
 use App\Repository\QrCodeRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -37,7 +38,7 @@ class MeController extends AbstractController
         return $data;
     }
 
-    public function __invoke(Request $request, GamesRepository $gr, TokenGeneratorInterface $tk , MailerInterface $mailer , QuestRepository $questRep, UserRepository $ur, UnlockGamesRepository $urRep , UploaderHelper $helper)
+    public function __invoke(Request $request, GamesRepository $gr, GameScoreRepository $gsp , TokenGeneratorInterface $tk , MailerInterface $mailer , QuestRepository $questRep, UserRepository $ur, UnlockGamesRepository $urRep , UploaderHelper $helper)
     { 
         $user = $this->security->getUser();
         if (empty($user)) {
@@ -45,6 +46,10 @@ class MeController extends AbstractController
         }
 
         $user = $ur->findOneBy(array('username' => $user->username));
+        $gameScore = $gsp->findBy(array('user' => $user->getId()));
+
+        $user->setUserScoreTotal($gameScore);
+        
         if (!$user instanceof User) {
             return $this->json_response('401', 'user not found');
         } else {

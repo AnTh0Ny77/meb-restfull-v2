@@ -66,10 +66,10 @@ class UpdatePasswordController extends AbstractController
                     $old_password = $content['actual_password'];
                     $passwordValid = $this->passwordHasher->isPasswordValid($user, $old_password); 
                     if ($passwordValid == false) {
-                        return $this->json_response('400', 'invalid credentials');
+                        return $this->json_response('400', 'Identifiant invalides');
                     }
                     if ($old_password === $plain_password ){
-                        return $this->json_response('400', 'need to be different');
+                        return $this->json_response('400', 'Les mots de passe doivent etre différents');
                     }
                     $user->setPlainPassword($plain_password);
                     $errors = $validator->validate($user);
@@ -96,9 +96,7 @@ class UpdatePasswordController extends AbstractController
                 }
                 
             }
-            
     }
-    
 
     }
 }

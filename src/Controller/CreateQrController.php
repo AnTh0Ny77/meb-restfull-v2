@@ -78,6 +78,38 @@ class CreateQrController extends AbstractController
             if (!$game instanceof Games) {
                 return $this->json_response('401', 'game not found');
             }else{
+
+                //verifie que le jeux est bien dispo 
+                if ($user->getId() != 914) {
+                  $arrayGame = $user->getClientGames() ;
+                  $verif = 0 ;
+                  $temp = false ;
+                    foreach ($arrayGame as $key => $value) {
+                        if ($value->getGame()->getId() == $game->getId()) {
+                            $verif ++ ;
+                            $temp = $value;
+                        }
+                    }
+                    if ($verif == 0) {
+                        return $this->json_response('407', 'Jeux non disponible');
+                    }
+                }
+                
+                
+                //si pas illimité fait payer 
+                if ($user->getClientInfiniteQr() == 0 ) {
+                   $prix = $temp->getCost();
+                   $results = floatval($user->getExploreCoin()) - floatval($prix) ;
+                   if ($results < 0) {
+                        return $this->json_response('408', 'Solde insufusant');
+                   }else{
+                        $user->setExploreCoin($results);
+                        $this->em->persist($user);
+                        $this->em->flush();
+                   }
+                }
+
+
                    $key = $this->randomKey();
                    $date = new DateTime('now');
                    $key = ''. $key;

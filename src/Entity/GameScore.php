@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\GameScoreRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: GameScoreRepository::class)]
 class GameScore
@@ -19,9 +20,11 @@ class GameScore
 
     #[ORM\ManyToOne(targetEntity: Games::class)]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['read:User'])]
     private $game;
 
     #[ORM\Column(type: 'integer', nullable: true)]
+    #[Groups(['read:User'])]
     private $score;
 
     public function getId(): ?int

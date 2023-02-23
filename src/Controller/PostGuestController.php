@@ -63,7 +63,7 @@ class PostGuestController extends AbstractController
                     $plain_pass = $this->randomPassword();
                     $pass = $hasher->hashPassword($user, $plain_pass);
                     $user->setPassword($pass);
-                  
+                    $user->setClientInfiniteQr(0);
                     $Rank = $rankRepository->findOneBy(['id' => 1 ]);
                     $user->setRank($Rank);
                     $this->em->persist($user);

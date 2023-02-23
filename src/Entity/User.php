@@ -7,11 +7,15 @@ use App\Controller\MeController;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\RankRepository;
 use App\Repository\UserRepository;
+use App\Repository\GameScoreRepository;
 use App\Controller\PutUserController;
 use App\Controller\GetCoverController;
 use App\Controller\CoverUserController;
 use App\Controller\GetClientController;
+use App\Controller\PostClientController;
+use App\Controller\CoverClientController;
 use App\Controller\PostGuestController;
+use App\Controller\GetClientListController;
 use App\Controller\DeleteUserController;
 use App\Controller\ConfirmGuestController;
 use App\Controller\GetScoreControllerClass;
@@ -45,14 +49,28 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
                 'openapi_context' => [
                     'security' => [['bearerAuth' => []]]
                 ]
+                
                 ],
-            'getScore' => [
-                'pagination_enabeld' => false,
-                'path' => 'user/scores',
-                'method' => 'get',
-                'controller' => GetScoreControllerClass::class,
-                'read' => false,
-            ], 
+                'listC' => [
+                'path' => 'user/clientlist',
+                'method' => 'post',
+                'controller' => GetClientListController::class,
+                'normalization_context' => ['groups' => 'read:Client:User'],
+                ],
+                'PostClientController' => [
+                    'path' => 'user/postclient',
+                    'method' => 'post',
+                    'controller' => PostClientController::class,
+                    'deserialize' => false ,
+                    'normalization_context' => ['groups' => 'read:User']
+                ], 
+                'getScore' => [
+                    'pagination_enabeld' => false,
+                    'path' => 'user/scores',
+                    'method' => 'get',
+                    'controller' => GetScoreControllerClass::class,
+                    'read' => false,
+                ], 
             'ResetPassword' => [
                 'pagination_enabeld' => false,
                 'path' => 'user/reset/password',
@@ -204,7 +222,14 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
                         ]
                     ]
                 ]
-            ], 'cover' => [
+            ], 'CoverClientController' => [
+                'method' => 'post',
+                'path' => 'user/coverclient',
+                'deserialize' => false,
+                'controller' => CoverClientController::class
+            ],
+            
+            'cover' => [
             'method' => 'post',
             'path' => 'user/cover',
             'deserialize' => false,
@@ -569,6 +594,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
     private $phone;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: GameScore::class, orphanRemoval: true)]
+    #[Groups(['read:User'])]
     private $GameScore;
 
     #[ORM\Column(type: 'json', nullable: true)]
@@ -595,6 +621,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
     #[Groups(['read:Client:User'])]
     private $stat;
 
+    #[Groups(['read:User'])]
+    private $userScoreTotal;
+
     public function __construct()
     {
         
@@ -605,7 +634,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
         $this->poiScores = new ArrayCollection();
         $this->Game = new ArrayCollection();
         $this->clientGames = new ArrayCollection();
-        $this->clientInfiniteQr = 0 ;
+        // $this->clientInfiniteQr = 0 ;
         $this->transacs = new ArrayCollection();
     }
 
@@ -626,6 +655,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
     public function getEmail(): ?string
     {
         return $this->email;
+    }
+
+    public function getUserScoreTotal(){
+        return $this->userScoreTotal;
+    }
+
+    public function setUserScoreTotal($entry){
+        if (!empty($entry)) {
+           $this->userScoreTotal = $entry;
+            return $this;
+        }
+        return [];
     }
 
     public function setEmail(string $email): self

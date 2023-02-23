@@ -148,7 +148,7 @@ class Games
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups([ 'read:Games' , 'read:Game' , 'read:Game:User' , 'read:Client:User' ])]
+    #[Groups([ 'read:Games' , 'read:Game' , 'read:User' ,'read:Game:User' , 'read:Client:User' ])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 100)]

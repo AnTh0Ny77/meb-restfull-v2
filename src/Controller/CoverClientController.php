@@ -61,7 +61,7 @@ class CoverClientController extends AbstractController
                        return $this->json_response('401', 'user not found ');
                     }
 
-                    $temp = $ur->findOneBy(['id' => $content]);
+                    $temp = $ur->findOneBy(['email' => $content]);
                     if (!$temp instanceof User) {
                          return $this->json_response('401', 'user not found');
                     }

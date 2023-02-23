@@ -81,7 +81,7 @@ class PostClientController extends AbstractController
             $this->em->persist($insert);
             $this->em->flush();
 
-            $response = ["message" => "OK ! "];
+            $response = ["message" => $insert->getEmail()];
             $data = new JsonResponse($response, '200');
             return $data; 
         }

@@ -61,6 +61,18 @@ class PostClientController extends AbstractController
             } else {
                 $insert->setLocation([]);
             }
+
+            
+            $username_test =  $ur->findOneBy(array('username' => $content['username']));
+            if ($username_test instanceof User) {
+                return $this->json_response('401', 'username déja utilisé');
+            }
+
+
+            $email_test =  $ur->findOneBy(array('email' => $content['email']));
+            if ($email_test instanceof User) {
+                return $this->json_response('401', 'mail déja utilisé');
+            }
             
             $Rank = $rankRepository->findOneBy(['id' => 1 ]);
             

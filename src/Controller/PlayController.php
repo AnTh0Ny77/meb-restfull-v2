@@ -215,7 +215,6 @@ class PlayController extends AbstractController
             
             switch (intval($slide->getTypeSlide()->getId())) {
                 case 1:
-                case 3:
                     $score = new Score();
                     $score->setSlide($slide);
                     $score->setUser($user);
@@ -275,6 +274,7 @@ class PlayController extends AbstractController
                    
                     break;
                 case 4:
+                case 3:
                     if (empty($slide->getSolution())) {
                         return $this->json_response('500', 'wrong data base configutation for slide type (empty response list)');
                     }

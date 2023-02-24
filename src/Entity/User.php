@@ -13,6 +13,7 @@ use App\Controller\GetCoverController;
 use App\Controller\CoverUserController;
 use App\Controller\GetClientController;
 use App\Controller\PostClientController;
+use App\Controller\GetClientAdminController;
 use App\Controller\CoverClientController;
 use App\Controller\PostGuestController;
 use App\Controller\GetClientListController;
@@ -398,7 +399,14 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
                 'summary' => 'Client - retrieves a client data ( need a client role )',
             ],
             'normalization_context' => ['groups' => ['read:Client:User']]
-        ], 'reloadCoin' => [
+        ], 'GetClientAdminController' => [
+            'pagination_enabeld' => false,
+            'method' => 'get',
+            'path' => '/user/{id}/clientone',
+            'controller' => GetClientAdminController::class,
+            'normalization_context' => ['groups' => ['read:Client:User']]
+        ],
+        'reloadCoin' => [
             'pagination_enabeld' => false,
             'method' => 'put',
             'path' => '/user/{id}/coin',
@@ -583,8 +591,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
     #[Groups(['read:Poi:User'])]
     private $poiScores;
 
-    
-
     #[ORM\ManyToOne(targetEntity: Rank::class, inversedBy: 'User')]
     #[Groups(['read:User'])]
     private $rank;
@@ -598,6 +604,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
     private $GameScore;
 
     #[ORM\Column(type: 'json', nullable: true)]
+    #[Groups(['read:Client:User'])]
     private $location = [];
 
 

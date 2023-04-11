@@ -72,7 +72,7 @@ class CreateQrController extends AbstractController
 
             if (empty($content['time'])) {
                 $time = 48 ;
-            } else $time = $content['time'];
+            } else $time = intval($content['time']);
 
             $game = $gr->findOneBy(array('id' => intval($content['game'])));
             if (!$game instanceof Games) {
@@ -142,7 +142,7 @@ class CreateQrController extends AbstractController
                     ->margin(10)
                     ->roundBlockSizeMode(new RoundBlockSizeModeMargin())
                     ->labelText($game->getName())
-                    ->labelFont(new NotoSans(15))
+                    ->labelFont(new NotoSans(12))
                     ->labelAlignment(new LabelAlignmentCenter())
                     ->build();
                     

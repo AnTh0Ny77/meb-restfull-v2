@@ -12,6 +12,7 @@ use App\Controller\PutUserController;
 use App\Controller\GetCoverController;
 use App\Controller\CoverUserController;
 use App\Controller\GetClientController;
+use App\Controller\UpdateClientController;
 use App\Controller\PostClientController;
 use App\Controller\GetClientAdminController;
 use App\Controller\CoverClientController;
@@ -64,7 +65,13 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
                     'controller' => PostClientController::class,
                     'deserialize' => false ,
                     'normalization_context' => ['groups' => 'read:User']
-                ], 
+                ], 'UpdateClientController' => [
+                    'path' => 'user/updateclient',
+                    'method' => 'put',
+                    'controller' => UpdateClientController::class,
+                    'deserialize' => false ,
+                    'normalization_context' => ['groups' => 'read:User']
+                ],
                 'getScore' => [
                     'pagination_enabeld' => false,
                     'path' => 'user/scores',
@@ -335,7 +342,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
                         ]
                     ]
                 ],
-            ], 
+            ],  
             "GetCover" => [
                 'method' => 'Get',
                 'path' => 'user/{id}/cover',

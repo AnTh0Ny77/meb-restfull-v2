@@ -12,6 +12,7 @@ use App\Repository\QrCodeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\UnlockGamesRepository;
 use DateTime;
+use DateInterval;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Routing\Annotation\Route;
@@ -38,6 +39,7 @@ class UnlockGamesController extends AbstractController
 
     public function __invoke(Request $request, GamesRepository $gr , QrCodeRepository $qrRep  , UserRepository $ur , UnlockGamesRepository $urRep)
     {
+        
         $user = $this->security->getUser();
         if (empty($user)){
             return $this->json_response('401', 'JWT Token  not found');
@@ -65,12 +67,14 @@ class UnlockGamesController extends AbstractController
                         //     return $this->json_response('401', 'Game already unlocked');
                         // }
                         $time = $match->getTime();
+                        $time = $this->ajouterHeures($match->getCreatedAt(),$match->getTime());
+                        
                         $newGame = new UnlockGames();
                         $newGame->setIdUser($user);
                         $newGame->setFinish(0);
                         $newGame->setQrCode($match);
-                        $date = new DateTime('now +'.$time.' hours');
-                        $newGame->setDate($date);
+                        // $date = new DateTime($time);
+                        $newGame->setDate($time);
                         $this->em->persist($newGame);
                         $this->em->flush();
                         $game = $gr->findOneBy(array('id' => $match->getIdGame()));
@@ -89,5 +93,22 @@ class UnlockGamesController extends AbstractController
             }    
         }
         return $user;
+    }
+
+    function ajouterHeures($date, $heures) {
+        // créer un objet DateTime à partir de la date donnée
+        // $dateObj = new DateTime($date);
+
+        // ajouter le nombre d'heures
+        $date->modify('+ '.$heures.' hours');
+        if ($date->format('i') > 30) {
+            $date->modify('+1 hour')->setTime($date->format('H'), 0);
+            } 
+            // Sinon, arrondir à l'heure inférieure
+            else {
+                $date->setTime($date->format('H'), 0);
+            }
+        // retourner la nouvelle date et heure sous forme d'objet DateTime
+        return $date;
     }
 }

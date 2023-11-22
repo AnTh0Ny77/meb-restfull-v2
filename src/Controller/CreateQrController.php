@@ -112,6 +112,8 @@ class CreateQrController extends AbstractController
 
                    $key = $this->randomKey();
                    $date = new DateTime('now');
+                   $date->modify('+' . (30 - $date->format('i') % 30) . ' minutes')->setTime($date->format('H'), 0);
+                 
                    $key = ''. $key;
                    $qr = new QrCode();
                    $qr->setIdClient($user);

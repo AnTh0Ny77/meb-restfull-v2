@@ -44,7 +44,7 @@ class GetScoreControllerClass extends AbstractController
     public function __invoke(GameScoreRepository $gsr , UserRepository $ur)
     {
        
-      $users = $ur->findAll();
+      $users = $ur->findNotGuest();
       $results = [];
       foreach ($users as $key => $value) {
           $user_total = 0 ;

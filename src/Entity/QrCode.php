@@ -106,7 +106,8 @@ class QrCode
 
     public function __construct()
     {
-        $this->createdAt = new \DateTime("now");
+         $this->createdAt = new \DateTime("now");
+        $this->createdAt->setTime($this->createdAt->format('H'), 0, 0);
     }
 
     public function getId(): ?int

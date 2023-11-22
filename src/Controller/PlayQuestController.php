@@ -83,18 +83,14 @@ class PlayQuestController extends AbstractController
         $quest =  $request->get('data');
 
         if (!$quest instanceof Quest) 
-            return $this->json_response('401', 'Slide not found');
+            return $this->json_response('400', 'Slide not found');
 
         $verify_quest = $qr->findOneBy(['questId' => $quest->getID(), 'userId' => $user->getId()]);
 
-        if ($verify_quest instanceof QuestScore and $verify_quest->getFinished() == 1 )
-            return $this->json_response('401', 'You have already finished '.$quest->getName().'');
         
         $game = $quest->getGame();
         $verify = $urRep->findUnlockedr($user->getId(), intval($game->getId()));
 
-        if (empty($verify))
-            return $this->json_response('401', 'the game must be unlocked ');
 
         $answer = json_decode($request->getContent());
 

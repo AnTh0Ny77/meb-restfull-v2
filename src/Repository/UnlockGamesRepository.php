@@ -80,6 +80,24 @@ class UnlockGamesRepository extends ServiceEntityRepository
         // returns an array of arrays (i.e. a raw data set)
         return $resultSet->fetchAllAssociative();
     }
+
+
+     public function findUnlockedrArray($idUser , $idGame)
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = '
+            SELECT * , q.id_game_id   FROM unlock_games u
+            INNER JOIN qr_code AS q ON ( q.id = u.qr_code_id )
+            WHERE u.id_user_id = :val AND q.id_game_id = :game
+            LIMIT 100
+            ';
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery(['val' => $idUser , 'game' => $idGame]);
+
+        // returns an array of arrays (i.e. a raw data set)
+        return $resultSet->fetchAllAssociative();
+    }
     
 
     /*

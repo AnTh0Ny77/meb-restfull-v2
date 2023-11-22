@@ -12,4 +12,5 @@ gesdinet_jwt_refresh_token:
 
 app_reset_password:
     path: /reset/password
+    controller: App\Controller\FormResetPasswordController::formsPassword
     

@@ -52,23 +52,26 @@ class FinishGameController extends AbstractController
             if (!$game instanceof Games) {
                 return $this->json_response('401', 'Game not found');
             }
-            $verify = $urRep->findUnlockedr($user->getId(), intval($game->getId()));
+            $verify = $urRep->findUnlockedrArray($user->getId(), intval($game->getId()));
+           
             if (empty($verify)) {
                 return $this->json_response('401', 'Game not unlocked');
             }
             foreach ($verify as $key => $value) {
-                    $value = $urRep->findOneBy(array('qrCode' => intval($value['qr_code_id'])));
-                    if ($value instanceof UnlockGames) {
-                        $value->setFinish(1);
-                        $this->em->persist($value);
+                   
+                    $temp = $urRep->findOneBy(array('qrCode' => $value['qr_code_id']));
+                    
+                    if ($temp instanceof UnlockGames) {
+                        $temp->setFinish(1);
+                        $this->em->persist($temp);
                         $this->em->flush();
-                        return $this->json_response('200', 'finished !');
                     }else{
                         return $this->json_response('401', 'Wrong configuration ');
                     }
                 
             }
-            
+              
+             return $this->json_response('200', 'finished !');
 
         }
 

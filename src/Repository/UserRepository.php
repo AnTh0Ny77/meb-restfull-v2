@@ -87,6 +87,14 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->getResult()
         ;
     }
+
+    public function findNotGuest(){
+        return $this->createQueryBuilder('u')
+            ->where('u.confirmed = 1')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
     
     public function returnMaxGuest()
     {

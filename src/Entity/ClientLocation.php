@@ -3,9 +3,45 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Common\Collections\Collection;
+use App\Repository\BagToolsRepository;
+use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
+use Symfony\Component\Serializer\Annotation\Groups;
+use App\Repository\ClientLocationRepository;
+use App\Controller\ClientLocationController;
 
-#[ORM\Entity(repositoryClass: GamesRepository::class)]
+#[ORM\Entity(repositoryClass: ClientLocationRepository::class)]
 #[ORM\Table(name: "client_location")]
+#[ApiResource(
+    collectionOperations: [
+        'get' => [
+            'pagination_enabeld' => false,
+            'method' => 'get',
+            'path' => '/clientLocation'
+        ] ,'PostClientLocation' => [
+                    'path' => '/clientLocation',
+                    'method' => 'post',
+                    'controller' => ClientLocationController::class,
+                    'deserialize' => false 
+            ]
+    ],
+    itemOperations: [
+         'get' => [
+            'pagination_enabeld' => false,
+            'method' => 'get',
+            'path' => '/clientLocation/{id}'
+        ] , 
+        'delete' => [
+            'pagination_enabeld' => false,
+            'method' => 'delete',
+            'path' => '/clientLocation/{id}'
+        ]
+    ])]
+#[ApiFilter(OrderFilter::class, properties: ['booleanColumn' => 'desc' , 'id' => 'asc'])]
 class ClientLocation
 {
     #[ORM\Id]
@@ -26,7 +62,7 @@ class ClientLocation
     #[ORM\Column(type: "text", nullable: true)]
     private $postal;
 
-    #[ORM\Column(type: "boolean", nullable: true)]
+    #[ORM\Column(type: "boolean", name: "boolean_column" , nullable: true)]
     private $booleanColumn;
 
 
@@ -95,5 +131,5 @@ class ClientLocation
         return $this;
     }
 
-    // You may also need to generate these methods using your IDE or Symfony console.
+  
 }

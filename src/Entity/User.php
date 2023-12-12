@@ -1209,4 +1209,51 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
 
         return $this;
     }
+
+
+#[ORM\OneToMany(targetEntity: "App\Entity\ClientLocation", mappedBy: "user")]
+private $clientLocations;
+
+    /**
+     * @return Collection|ClientLocation[]
+    */
+    public function getClientLocations(): Collection
+    {
+        return $this->clientLocations;
+    }
+
+
+    public function setClientLocations(Collection $clientLocations): self
+    {
+        $this->clientLocations = $clientLocations;
+
+        // set the owning side of the relationship if necessary
+        foreach ($clientLocations as $clientLocation) {
+            $clientLocation->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function addClientLocation(ClientLocation $clientLocation): self
+    {
+        if (!$this->clientLocations->contains($clientLocation)) {
+            $this->clientLocations[] = $clientLocation;
+            $clientLocation->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeClientLocation(ClientLocation $clientLocation): self
+    {
+        if ($this->clientLocations->removeElement($clientLocation)) {
+            // set the owning side to null (unless already changed)
+            if ($clientLocation->getUser() === $this) {
+                $clientLocation->setUser(null);
+            }
+        }
+
+        return $this;
+    }
 }

@@ -88,6 +88,9 @@ class Quest
     #[Groups(['read:oneQuest', 'read:Game' , 'read:Game:User'])]
     private $responseQuest;
 
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $textQuest;
+
     #[ORM\OneToMany(mappedBy: 'quest', targetEntity: Poi::class)]
     #[Groups([ 'read:oneQuest' , 'read:Game' , 'read:Game:User'])]
     private $poi;
@@ -180,6 +183,19 @@ class Quest
     }
 
     public function setResponseQuest(?string $responseQuest): self
+    {
+        $this->responseQuest = $responseQuest;
+
+        return $this;
+    }
+
+
+     public function getTextQuest(): ?string
+    {
+        return $this->responseQuest;
+    }
+
+    public function setTextQuest(?string $responseQuest): self
     {
         $this->responseQuest = $responseQuest;
 

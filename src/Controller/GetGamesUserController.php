@@ -9,12 +9,14 @@ use App\Entity\QrCode;
 use DateTimeImmutable;
 use App\Entity\GameScore;
 use App\Entity\UnlockGames;
+use App\Entity\ClientLocation;
 use App\Repository\UserRepository;
 use App\Repository\GamesRepository;
 use App\Repository\QuestRepository;
 use Symfony\Component\Mime\Address;
 use App\Repository\QrCodeRepository;
 use App\Repository\GameScoreRepository;
+use App\Repository\ClientLocationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\UnlockGamesRepository;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
@@ -42,25 +44,50 @@ class GetGamesUserController extends AbstractController
         return $data;
     }
 
-    public function returnPartner(Games $game , User $user , UnlockGamesRepository $urRep, QrCodeRepository $qrp ){
+    public function returnPartner(Games $game , User $user , UnlockGamesRepository $urRep, QrCodeRepository $qrp  , ClientLocationRepository $clr){
         $unlockGamesCollection =  $urRep->findBy(['idUser' => $user->getId()]);
         foreach ($unlockGamesCollection as  $value) {
             $qr = $qrp->findOneBy(['id' => $value->getQrCode()]);
             if ($qr->getIdGame()->getId() == $game->getId()) {
                 $partner = $qr->getIdClient();
                 if ($partner instanceof User) {
-                    $location = $partner->getLocation();
-                    $phone = $partner->getPhone();
-                    $name = $partner->getUsername();
-                    $lat = $location['lat'];
-                    $lng = $location['lng'];
-                    $partner = [
-                        $name , 
-                        $phone ,
-                        $lat ,
-                        $lng
-                    ];
+                    $locationData = $clr->findOneBy(['user' => $user->getId(), 'booleanColumn' => true]);
+                    if ( $locationData instanceof ClientLocation ) {
+                        $phone = $partner->getPhone();
+                        $name = $partner->getUsername();
+                        $locationName =   $locationData->getTextColumn();
+                        $locationPostal = $locationData->getPostal();
+                        $loc_data = json_decode($locationData->getJsonColumn()[0]);
+                        $lat = $loc_data->lat;
+                        $lng = $loc_data->lng;
+                        $partner = [
+                            $name , 
+                            $phone ,
+                            $lat ,
+                            $lng , 
+                            $locationPostal , 
+                            $locationName
+                        ];
+                        return  $partner;
+                    }else{
+                        $location = $partner->getLocation();
+                        $phone = $partner->getPhone();
+                        $name = $partner->getUsername();
+                        $lat = $location['lat'];
+                        $lng = $location['lng'];
+                        $locationPostal = "18 avenue de la paix Paris";
+                        $locationName = "Nom de la location";
+
+                        $partner = [
+                            $name , 
+                            $phone ,
+                            $lat ,
+                            $lng , 
+                            $locationPostal , 
+                            $locationName
+                        ];
                     return  $partner;
+                    }
                 }else {
                     return null;
                 }
@@ -91,7 +118,8 @@ class GetGamesUserController extends AbstractController
         return false;
     }
 
-    public function __invoke(Request $request, GamesRepository $gr, GameScoreRepository $gsr  , QrCodeRepository $qrp , TokenGeneratorInterface $tk, MailerInterface $mailer, QuestRepository $questRep, UserRepository $ur, UnlockGamesRepository $urRep, UploaderHelper $helper)
+    public function __invoke(Request $request, GamesRepository $gr, GameScoreRepository $gsr  , QrCodeRepository $qrp , TokenGeneratorInterface $tk, MailerInterface $mailer, 
+    QuestRepository $questRep, UserRepository $ur, UnlockGamesRepository $urRep, UploaderHelper $helper , ClientLocationRepository $clr)
     {
         $user = $this->security->getUser();
         
@@ -114,7 +142,7 @@ class GetGamesUserController extends AbstractController
                 //     return $this->json_response('400', 'Game is finish');
                 // }
 
-                $partner = $this->returnPartner($game, $user, $urRep, $qrp);
+                $partner = $this->returnPartner($game, $user, $urRep, $qrp , $clr);
                 $game->setPartner($partner);
 
                 $game_score = $gsr->findOneBy(['game' => $game->getID(), 'user' => $user->getId()]);

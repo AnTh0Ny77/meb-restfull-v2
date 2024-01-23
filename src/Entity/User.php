@@ -932,10 +932,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , JWTUse
         return $this;
     }
 
+    #[ORM\Column(type: "string", nullable: true)]
     private $forgotPasswordToken;
 
     private $forgotPasswordTokenRequestedAt;
     
+    #[ORM\Column(type: 'datetime')]
     private $forgotPasswordTokenMustBeVerifiedBefore;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Transac::class)]

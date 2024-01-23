@@ -89,6 +89,7 @@ class Quest
     private $responseQuest;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['read:Quest', 'read:oneQuest' , 'read:Game' , 'read:Game:User'])]
     private $textQuest;
 
     #[ORM\OneToMany(mappedBy: 'quest', targetEntity: Poi::class)]

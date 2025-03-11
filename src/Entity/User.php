@@ -19,6 +19,8 @@ use App\Controller\CoverClientController;
 use App\Controller\PostGuestController;
 use App\Controller\GetClientListController;
 use App\Controller\DeleteUserController;
+use App\Controller\DeleteUserControllerToken;
+use App\Controller\DeleteUserFinalController;
 use App\Controller\ConfirmGuestController;
 use App\Controller\GetScoreControllerClass;
 use App\Controller\ResetPasswordController;
@@ -235,6 +237,12 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
                 'path' => 'user/coverclient',
                 'deserialize' => false,
                 'controller' => CoverClientController::class
+            ],'DeleteTokenUserFinal' => [
+            'pagination_enabeld' => false,
+            'path' => 'user/delete/final',
+            'controller' => DeleteUserFinalController::class,
+            'deserialize' => false,
+            'method' => 'post'
             ],
             
             'cover' => [
@@ -392,6 +400,15 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
             'controller' => DeleteUserController::class,
             'read' =>  true,
             'method' => 'delete',
+            'openapi_context' => [
+                'security' => [['bearerAuth' => []]]
+            ]
+        ], 'DeleteTokenUser' => [
+            'pagination_enabeld' => false,
+            'path' => 'user/{id}/delete',
+            'controller' => DeleteUserControllerToken::class,
+            'read' =>  true,
+            'method' => 'get',
             'openapi_context' => [
                 'security' => [['bearerAuth' => []]]
             ]

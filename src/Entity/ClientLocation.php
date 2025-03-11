@@ -9,6 +9,7 @@ use App\Repository\BagToolsRepository;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
 use App\Repository\ClientLocationRepository;
@@ -42,6 +43,7 @@ use App\Controller\ClientLocationController;
         ]
     ])]
 #[ApiFilter(OrderFilter::class, properties: ['booleanColumn' => 'desc' , 'id' => 'asc'])]
+#[ApiFilter(SearchFilter::class, properties: ['user' => 'exact'])] 
 class ClientLocation
 {
     #[ORM\Id]

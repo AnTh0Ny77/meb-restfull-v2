@@ -64,6 +64,7 @@ class DeleteUserController extends AbstractController
 
             if ($userUri->getId() !=  $user->getId() )
                 return $this->json_response('401', 'cannot handle other users');
+
             
             $asr = $sr->findBy(['User' => $user->getId()]);
             if (!empty($asr)) {

@@ -44,15 +44,24 @@ class GetGamesUserController extends AbstractController
         return $data;
     }
 
-    public function returnPartner(Games $game , User $user , UnlockGamesRepository $urRep, QrCodeRepository $qrp  , ClientLocationRepository $clr){
+    public function returnPartner(Games $game , User $user , UserRepository $ur , UnlockGamesRepository $urRep, QrCodeRepository $qrp  , ClientLocationRepository $clr){
+       
         $unlockGamesCollection =  $urRep->findBy(['idUser' => $user->getId()]);
+        
         foreach ($unlockGamesCollection as  $value) {
+           
             $qr = $qrp->findOneBy(['id' => $value->getQrCode()]);
+             
             if ($qr->getIdGame()->getId() == $game->getId()) {
                 $partner = $qr->getIdClient();
+               
+                $partner = $ur->findOneBy(['id' => $partner]);
+               
                 if ($partner instanceof User) {
-                    $locationData = $clr->findOneBy(['user' => $user->getId(), 'booleanColumn' => true]);
+                    $locationData = $clr->findOneBy(['user' => $partner->getId(), 'booleanColumn' => true]);
+                    
                     if ( $locationData instanceof ClientLocation ) {
+                        
                         $phone = $partner->getPhone();
                         $name = $partner->getUsername();
                         $locationName =   $locationData->getTextColumn();
@@ -60,31 +69,44 @@ class GetGamesUserController extends AbstractController
                         $loc_data = json_decode($locationData->getJsonColumn()[0]);
                         $lat = $loc_data->lat;
                         $lng = $loc_data->lng;
-                        $partner = [
-                            $name , 
-                            $phone ,
-                            $lat ,
-                            $lng , 
-                            $locationPostal , 
-                            $locationName
-                        ];
+
+                        if ($qr->getEndPoint()) {
+                            $partner = [
+                                $name , 
+                                $phone ,
+                                '' ,
+                                '' , 
+                                '' , 
+                                '' 
+                            ];
+                        } else {
+                            $partner = [
+                                $name , 
+                                $phone ,
+                                $lat ,
+                                $lng , 
+                                $locationPostal , 
+                                $locationName 
+                            ];
+                        }
                         return  $partner;
                     }else{
+                      
                         $location = $partner->getLocation();
                         $phone = $partner->getPhone();
                         $name = $partner->getUsername();
-                        $lat = $location['lat'];
-                        $lng = $location['lng'];
+                        $lat = 123;
+                        $lng = 123;
                         $locationPostal = "18 avenue de la paix Paris";
                         $locationName = "Nom de la location";
 
                         $partner = [
                             $name , 
                             $phone ,
-                            $lat ,
-                            $lng , 
-                            $locationPostal , 
-                            $locationName
+                            '' ,
+                            '' , 
+                            '' , 
+                            ''
                         ];
                     return  $partner;
                     }
@@ -93,6 +115,7 @@ class GetGamesUserController extends AbstractController
                 }
             }
         }
+        
         return null;
     }
 
@@ -142,7 +165,7 @@ class GetGamesUserController extends AbstractController
                 //     return $this->json_response('400', 'Game is finish');
                 // }
 
-                $partner = $this->returnPartner($game, $user, $urRep, $qrp , $clr);
+                $partner = $this->returnPartner($game, $user, $ur , $urRep, $qrp , $clr);
                 $game->setPartner($partner);
 
                 $game_score = $gsr->findOneBy(['game' => $game->getID(), 'user' => $user->getId()]);

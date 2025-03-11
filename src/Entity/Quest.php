@@ -193,12 +193,12 @@ class Quest
 
      public function getTextQuest(): ?string
     {
-        return $this->responseQuest;
+        return $this->textQuest;
     }
 
-    public function setTextQuest(?string $responseQuest): self
+    public function setTextQuest(?string $textQuest): self
     {
-        $this->responseQuest = $responseQuest;
+        $this->textQuest = $textQuest;
 
         return $this;
     }

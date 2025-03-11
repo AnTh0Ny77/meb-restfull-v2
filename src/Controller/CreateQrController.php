@@ -74,6 +74,10 @@ class CreateQrController extends AbstractController
                 $time = 48 ;
             } else $time = intval($content['time']);
 
+            if (!empty($content['endPoint'])) {
+                $endPoint = false;
+            } else $endPoint = true;
+
             $game = $gr->findOneBy(array('id' => intval($content['game'])));
             if (!$game instanceof Games) {
                 return $this->json_response('401', 'game not found');
@@ -113,7 +117,6 @@ class CreateQrController extends AbstractController
                    $key = $this->randomKey();
                    $date = new DateTime('now');
                    $date->modify('+' . (30 - $date->format('i') % 30) . ' minutes')->setTime($date->format('H'), 0);
-                 
                    $key = ''. $key;
                    $qr = new QrCode();
                    $qr->setIdClient($user);
@@ -121,17 +124,22 @@ class CreateQrController extends AbstractController
                    $qr->setQrLock(0);
                    $qr->setIdGame($game);
                    $qr->setTime(intval($time));
+                   $qr->setEndPoint($endPoint);
                    $this->em->persist($qr);
                    $this->em->flush();
-                 
                    $link = '/api/UnlockGame/unlock?secret='. $key;
                    $response = [
                         "url" =>  $link,
                        
                     ];
+
                     $baseurl = $request->getScheme() . '://' . $request->getHttpHost() . $request->getBasePath();
-                    
                     $link = $baseurl . ''. $link;
+                    if (empty($content['label'])) {
+                       $label = $game->getName();
+                    }else{
+                        $label = $content['label'];
+                    }
                     
                    
                     $result = Builder::create()
@@ -143,7 +151,7 @@ class CreateQrController extends AbstractController
                     ->size(300)
                     ->margin(10)
                     ->roundBlockSizeMode(new RoundBlockSizeModeMargin())
-                    ->labelText($game->getName())
+                    ->labelText($label)
                     ->labelFont(new NotoSans(12))
                     ->labelAlignment(new LabelAlignmentCenter())
                     ->build();

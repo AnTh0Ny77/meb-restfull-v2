@@ -103,6 +103,10 @@ class QrCode
     #[Groups(['read:Client:User'])]
     private $createdAt;
 
+    #[ORM\Column(type: 'boolean', nullable: true)]
+    #[Groups(['read:Client:User'])]
+    private ?bool $endPoint = null;
+
 
     public function __construct()
     {
@@ -184,6 +188,17 @@ class QrCode
     {
         $this->createdAt = $createdAt;
 
+        return $this;
+    }
+
+    public function getEndPoint(): ?bool
+    {
+        return $this->endPoint ?? false;
+    }
+
+    public function setEndPoint(?bool $endPoint): self
+    {
+        $this->endPoint = $endPoint;
         return $this;
     }
 
